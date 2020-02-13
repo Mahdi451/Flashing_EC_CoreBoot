@@ -20,8 +20,8 @@ This command will install all the modules needed to allow the script to run.
 
 ## Running
 
-Before running the script you will need to store the cb/ec bins within 
-a folder called *__latest__*<br>located in the same directory as the script
+Before running the script you will need to store the cb/ec bins in a new
+folder called _latest_ that should be located in the same directory as the script
 
 You can run this script by inputting the following into terminal.
 
