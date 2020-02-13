@@ -32,10 +32,10 @@ class ChromeTestLib(object):
         sftp.close()
 
         if self.run_command_to_check_non_zero_exit_status("ls " + dst, dut_ip):	
-            print ("--> File copy successfull.")	
+            print ("[Image Copy Successfull]")	
             return True
         else:
-            print ("--> File copy unsuccessfull.")	
+            print ("[Image Copy Unsuccessfull]")	
             return False
 
 
@@ -68,7 +68,8 @@ class ChromeTestLib(object):
                 if command_exit_status == 0:
                     #print ("exit status is 0")
                     #print(stdout.readline)
-                    return out
+                    #print("\nFlash Successful.")
+                    return True
                 elif "flashrom" in command:
                     print ("This is flashrom related command and flash status can be decided based on flashing only as verification fails most of the time!")
                     if "Erasing and writing flash chip... Verifying flash" in out:

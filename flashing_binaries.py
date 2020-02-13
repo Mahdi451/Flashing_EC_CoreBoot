@@ -84,13 +84,20 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
             cbCmd = "flashrom -p host -w " + cbImageDest
             #cbCmd = "ls -l " + cbImageDest
             cbFlashStatus = test.run_command_to_check_non_zero_exit_status(cbCmd, dut_ip)
+            if cbFlashStatus:
+                print("[Flash Successful]")
+            if not cbFlashStatus:
+                print("[Flash Unsuccessful]")
         if ecImageSrc:
             ecImageDest = "/tmp/autoflashEC.bin"
             copy_ec = test.copy_file_from_host_to_dut(ecImageSrc, ecImageDest, dut_ip)
             ecCmd = "flashrom -p ec -w " + ecImageDest
             #ecCmd = "ls -l " + ecImageDest
             ecFlashStatus = test.run_command_to_check_non_zero_exit_status(ecCmd, dut_ip)
+            if ecFlashStatus:
+                print("[Flash Successful]")
             if not ecFlashStatus:
+                print("[Flash Unsuccessful]")
                 flashDict[dut_ip] = flashing_status
                 resultDict.update(flashDict)
                 return flashDict
