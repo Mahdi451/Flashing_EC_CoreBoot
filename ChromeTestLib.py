@@ -1,10 +1,5 @@
-# Based on the ips, detect if its a chromeos system. If so, collect the logs and the version details.
-# extract logs and rename files to add an extension to it.
-# Copy the ready files into corresponding elasticsearch folder
-import os
-import platform
-import paramiko
-import re
+
+import re, os, platform, paramiko
 
 class ChromeTestLib(object):
 
@@ -51,18 +46,6 @@ class ChromeTestLib(object):
                 out = stdout.read().decode('utf-8').strip("\n")
                 #print ('This is output = %s'%stdout.read())
                 #print ('This is error = %s'%stderr.read())
-
-                """
-                while not stdout.channel.exit_status_ready():
-                        # Only print data if there is data to read in the channel
-                        if stdout.channel.recv_ready():
-                        rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
-                        if len(rl) > 0:
-                               # Print data from stdout
-                                print stdout.channel.recv(1024),
-            
-                print "Command done."
-                """
                 client.close()
                 print(out)
                 if command_exit_status == 0:
@@ -76,14 +59,12 @@ class ChromeTestLib(object):
                         return True
                     else:
                         return False
-
             except paramiko.ssh_exception.NoValidConnectionsError as error:
                 print("Failed to connect to host '%s' with error: %s" % (dut_ip, error))
             except paramiko.AuthenticationException as error:
                 print("Failed to authenticate dut '%s' with error: %s" % (dut_ip, error))
             except EOFError:
                 print ("Failed EOFError")
-
         return False
 
     def run_async_command(self, command, dut_ip, username = "root", password = "test0000"):
@@ -95,8 +76,7 @@ class ChromeTestLib(object):
                 client.connect(dut_ip, username= username, password= password)
                 stdin, stdout, stderr = client.exec_command(command)
                 client.close()
-                return True
-                              
+                return True              
             except paramiko.ssh_exception.NoValidConnectionsError as error:
                 print("Failed to connect to host '%s' with error: %s" % (dut_ip, error))
             except paramiko.AuthenticationException as error:
@@ -104,6 +84,11 @@ class ChromeTestLib(object):
             except EOFError:
                 print ("Failed EOFError")
         return False
+
+
+
+
+
 
     """ def check_if_system_is_a_chrome_os_system(self, ip):
         chromeos_detection_cmd = "cat /etc/lsb-release | grep -i chromeos_release_name"

@@ -1,26 +1,17 @@
-import argparse
-import os
-import sys
-import time
-import tarfile
-import glob
-import multiprocessing 
-import logging
-import subprocess
-import shlex
+
+import os, sys, time, argparse
+import tarfile, glob, shlex
+import subprocess, multiprocessing
+
 from functools import partial
 from collections import defaultdict
 from scapy.all import srp, Ether, ARP, conf
 from ChromeTestLib import ChromeTestLib
 
-
 cwd = os.getcwd()
 bin_location = cwd + "/latest"
 #print (bin_location)
-
 test = ChromeTestLib()
-
-#START IP list given from the cmd line
 parser = argparse.ArgumentParser()
 #parser.add_argument('--IP', dest='ip_addresses', help='provide remote system IPs', nargs='+')
 parser.add_argument('--IP',dest='ip',nargs='?',type=str,metavar=('IP_list.txt'),default='IPs.txt',help='list of IPs to flash')
@@ -31,6 +22,7 @@ with open(("%s/%s" % (cwd,args.ip))) as f:
     ip_lines=f.readlines()
     for ip in ip_lines:
         ip_list.append(ip.rstrip())
+
 
 def createFolders(absFolderPath):
     try:
@@ -44,18 +36,16 @@ def createFolders(absFolderPath):
         print (e)
         sys.exit(1)
 
+
 def find_and_return_latest_binaries(binaries_folder_location):
     d = dict()
-    
     try:
         files_array = os.listdir(binaries_folder_location)
     except OSError as e:
         print (e)
         return False
-
     if not files_array or len(files_array) > 2:  #it should have max 2 files inside.
         return False
-
     for file in files_array:
         if file.endswith(".bin"):
             file_path = os.path.join(binaries_folder_location, file)
@@ -71,12 +61,12 @@ def find_and_return_latest_binaries(binaries_folder_location):
                 print ("cb file path is: ", file_path)
                 abs_cb_image_path = file_path
                 d["cb"] = abs_cb_image_path
-
     if not d:
         print ("cb/ec images are not copied to binaries folder.")
         return False
     else:
         return d
+
 
 def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
     flashDict = dict()
@@ -108,7 +98,6 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
                 flashDict[dut_ip] = flashing_status
                 resultDict.update(flashDict)
                 return flashDict
-        
         if cbFlashStatus or ecFlashStatus:
             test.run_async_command("sleep 2; reboot > /dev/null 2>&1", dut_ip)
             print("\nChecking if DUT IP: %s is back online.\n" % dut_ip)
@@ -133,14 +122,12 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
 
 if __name__ == "__main__":
     t1=time.perf_counter()
-    
     flash_ec = flash_cb = False
     #CHECK if destination folder exist else exit
     if not os.path.isdir(bin_location):
         print("Binaries folder doesn't exist. Creating one. Copy binaries into folder named latest and rerun flashing script!")
         createFolders(bin_location)
         sys.exit(1)
-    
     bin_location = cwd + "/latest"
     binaryDict = find_and_return_latest_binaries(bin_location)
     if binaryDict:
@@ -151,18 +138,15 @@ if __name__ == "__main__":
     else:
         print("Binaries are not available. Copy binaries into folder named latest and rerun flashing script!")
         sys.exit(1)
-
     print("\nDUT IPs: %s\n"%ip_list)
     # END IP list given from the cmd line
     resultDict = dict()
-    
     # p.apply_async(FlashBinaries(i, resultDict, cbImageSrc = binaryDict["cb"], ecImageSrc = binaryDict["ec"]), ip_list, 1)
     with multiprocessing.Pool(multiprocessing.cpu_count()) as pool:
         resultDict=pool.map(partial(FlashBinaries,cbImageSrc = binaryDict["cb"],
             ecImageSrc = binaryDict["ec"]), ip_list)
     print ("\n*************************************************************")
     print(resultDict)         
-    
     t2=time.perf_counter()
     tot=t2-t1
     minutes=tot/60
