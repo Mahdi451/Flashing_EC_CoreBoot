@@ -12,7 +12,7 @@ is executed simultenously with other instances.
 
 You will need to execute this command in terminal. 
 
-```python
+```
 $ pip install -r requirements.txt
 ```
 
@@ -21,17 +21,17 @@ This command will install all the modules needed to allow the script to run.
 ## Running
 
 Before running the script you will need to store the cb/ec bins within 
-a folder called _latest_ located in the same directory as the script
+a folder called *__latest__*<br>located in the same directory as the script
 
 You can run this script by inputting the following into terminal.
 
-```python
+```
 $ python flashing_binaries.py --IP IP1 IP2 IP3 ... IP*
 ```
 
 The IPs should be listed like in the given example.
 
-```python
+```
 $ python flashing_binaries.py --IP 192.168.1.100 192.168.1.111 192.168.1.222 
 ```
 
