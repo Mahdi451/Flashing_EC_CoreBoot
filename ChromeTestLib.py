@@ -85,9 +85,9 @@ class ChromeTestLib(object):
 
         return False
 
-    """ def run_async_command(self, command, dut_ip, username = "root", password = "test0000"):
+    def run_async_command(self, command, dut_ip, username = "root", password = "test0000"):
         if self.check_if_remote_system_is_live(dut_ip):
-            print ("command is %s" % command)
+            #print ("command is %s" % command)
             try:
                 client = paramiko.SSHClient()
                 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -102,8 +102,7 @@ class ChromeTestLib(object):
                 print("Failed to authenticate dut '%s' with error: %s" % (dut_ip, error))
             except EOFError:
                 print ("Failed EOFError")
-
-        return False """
+        return False
 
     """ def check_if_system_is_a_chrome_os_system(self, ip):
         chromeos_detection_cmd = "cat /etc/lsb-release | grep -i chromeos_release_name"

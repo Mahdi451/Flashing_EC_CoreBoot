@@ -96,14 +96,15 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
                 return flashDict
         
         if cbFlashStatus or ecFlashStatus:
-            # test.run_async_command("sleep 2; reboot > /dev/null 2>&1", dut_ip)
-            #print("Checking if DUT is back online.\n")
+            test.run_async_command("sleep 2; reboot > /dev/null 2>&1", dut_ip)
+            print("\nChecking if DUT IP: %s is back online.\n" % dut_ip)
             time.sleep(3)
             for i in range(60):
                 if test.check_if_remote_system_is_live(dut_ip):
                     time.sleep(2)
                     flashing_status = "PASS"
                     flashDict[dut_ip] = flashing_status
+                    print("\nDUT IP: %s is back online." % dut_ip)
                     return flashDict
                 time.sleep(2)
             flashDict[dut_ip] = flashing_status
@@ -111,7 +112,6 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
             return flashDict
     else:
         print("DUT IP: %s is not live.\n" % dut_ip)
-    #print("DUT is back online.")
     flashDict[dut_ip] = flashing_status
     resultDict.update(flashDict)
     return flashDict   
