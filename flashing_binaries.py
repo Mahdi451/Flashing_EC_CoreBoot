@@ -22,8 +22,16 @@ test = ChromeTestLib()
 
 #START IP list given from the cmd line
 parser = argparse.ArgumentParser()
-parser.add_argument('--IP', dest='ip_addresses', help='provide remote system IPs', nargs='+')
+#parser.add_argument('--IP', dest='ip_addresses', help='provide remote system IPs', nargs='+')
+parser.add_argument('--IP',dest='ip',nargs='?',type=str,
+    metavar=('IP_list.txt'),default='ips.txt',help='list of IPs to flash')
 args = parser.parse_args()
+
+with open(("%s/%s" % (cwd,args.ip))) as f:
+    ip_list=list()
+    ip_lines=f.readlines()
+    for ip in ip_lines:
+        ip_list.append(ip.rstrip())
 
 def createFolders(absFolderPath):
     try:
@@ -145,12 +153,6 @@ if __name__ == "__main__":
         print("Binaries are not available. Copy binaries into folder named latest and rerun flashing script!")
         sys.exit(1)
 
-    if args.ip_addresses:
-        ip_list = args.ip_addresses
-    else:
-        ip_list = False
-        print("check --help or give cmd argument --IP <ip_address>")
-        sys.exit(1)
     print("\nDUT IPs: %s\n"%ip_list)
     # END IP list given from the cmd line
     resultDict = dict()
