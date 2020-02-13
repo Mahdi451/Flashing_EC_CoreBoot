@@ -27,10 +27,10 @@ class ChromeTestLib(object):
         sftp.close()
 
         if self.run_command_to_check_non_zero_exit_status("ls " + dst, dut_ip):	
-            print ("[Image Copy Successfull]")	
+            print ("DUT IP: %s\n[Image Copy Successfull]" % dut_ip)	
             return True
         else:
-            print ("[Image Copy Unsuccessfull]")	
+            print ("DUT IP: %s\n[Image Copy Unsuccessfull]" % dut_ip)	
             return False
 
 

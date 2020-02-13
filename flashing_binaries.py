@@ -92,9 +92,9 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
             #ecCmd = "ls -l " + ecImageDest
             ecFlashStatus = test.run_command_to_check_non_zero_exit_status(ecCmd, dut_ip)
             if ecFlashStatus:
-                print("[Flash Successful]")
+                print("DUT IP: %s\n[Flash Successful]" % dut_ip)
             if not ecFlashStatus:
-                print("[Flash Unsuccessful]")
+                print("DUT IP: %s\n[Flash Unsuccessful]" % dut_ip)
                 flashDict[dut_ip] = flashing_status
                 resultDict.update(flashDict)
                 return flashDict
