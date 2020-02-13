@@ -97,7 +97,7 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
         
         if cbFlashStatus or ecFlashStatus:
             # test.run_async_command("sleep 2; reboot > /dev/null 2>&1", dut_ip)
-            #print("\nChecking if DUT is back online.")
+            #print("Checking if DUT is back online.\n")
             time.sleep(3)
             for i in range(60):
                 if test.check_if_remote_system_is_live(dut_ip):
@@ -106,12 +106,12 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
                     flashDict[dut_ip] = flashing_status
                     return flashDict
                 time.sleep(2)
-            #print("DUT is back online.")
             flashDict[dut_ip] = flashing_status
             resultDict.update(flashDict)
             return flashDict
     else:
         print("DUT IP: %s is not live.\n" % dut_ip)
+    #print("DUT is back online.")
     flashDict[dut_ip] = flashing_status
     resultDict.update(flashDict)
     return flashDict   
@@ -152,7 +152,7 @@ if __name__ == "__main__":
     with multiprocessing.Pool(multiprocessing.cpu_count()) as pool:
         resultDict=pool.map(partial(FlashBinaries,cbImageSrc = binaryDict["cb"],
             ecImageSrc = binaryDict["ec"]), ip_list)
-    print ("*************************************************************")
+    print ("\n*************************************************************")
     print(resultDict)         
     
     t2=time.perf_counter()

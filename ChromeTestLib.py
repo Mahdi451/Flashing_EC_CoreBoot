@@ -21,7 +21,7 @@ class ChromeTestLib(object):
         else:
             return False
 
-            
+
     def copy_file_from_host_to_dut(self, src, dst, dut_ip):
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -64,12 +64,11 @@ class ChromeTestLib(object):
                 print "Command done."
                 """
                 client.close()
-                # for line in iter(p.stdout.readline, b'')
-                print (out)
+                print(out)
                 if command_exit_status == 0:
                     #print ("exit status is 0")
-                    print("")
-                    return out + "\nFlash was successfull."
+                    #print(stdout.readline)
+                    return out
                 elif "flashrom" in command:
                     print ("This is flashrom related command and flash status can be decided based on flashing only as verification fails most of the time!")
                     if "Erasing and writing flash chip... Verifying flash" in out:
