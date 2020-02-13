@@ -7,7 +7,7 @@ This script will allow you to both copy over and flash both cb/ec bins across mu
 
 You will need to execute this command in terminal. 
 
-```python
+```
 $ pip install -r requirements.txt
 ```
 
@@ -24,7 +24,7 @@ ChromeTestLib.py  flashing_binaries.py  IPs.txt  latest  README.md  requirements
 
 After that insert the IPs you would like to flash into *__IPs.txt__* and you are ready to run the script!
 
-```python
+```
 $ python flashing_binaries.py
 ```
 
