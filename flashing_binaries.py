@@ -23,8 +23,7 @@ test = ChromeTestLib()
 #START IP list given from the cmd line
 parser = argparse.ArgumentParser()
 #parser.add_argument('--IP', dest='ip_addresses', help='provide remote system IPs', nargs='+')
-parser.add_argument('--IP',dest='ip',nargs='?',type=str,
-    metavar=('IP_list.txt'),default='ips.txt',help='list of IPs to flash')
+parser.add_argument('--IP',dest='ip',nargs='?',type=str,metavar=('IP_list.txt'),default='IPs.txt',help='list of IPs to flash')
 args = parser.parse_args()
 
 with open(("%s/%s" % (cwd,args.ip))) as f:
