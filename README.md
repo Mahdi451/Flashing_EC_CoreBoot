@@ -1,12 +1,11 @@
 
+
 # Flashing Binaries
 
 
 ## Getting Started
 
-This script will allow you to both copy over and flash both cb/ec bins 
-across multiple platforms.<br>Using the multiprocessing module each flash 
-is executed simultenously with other instances. 
+This script will allow you to both copy over and flash both cb/ec bins across multiple platforms.<br>Using the multiprocessing module each flash is executed simultenously with other instances. 
 
 ## Prerequisites
 
@@ -20,15 +19,17 @@ This command will install all the modules needed to allow the script to run.
 
 ## Running
 
-Before running the script you will need to store the cb/ec bins within 
-a folder called *__latest__*<br>located in the same directory as the script
-
+Create a folder called *__latest__* in the same directory as the script.
+```
+ChromeTestLib.py  flashing_binaries.py  latest  README.md  requirements.txt
+```
+<br>
 You can run this script by inputting the following into terminal.
 
 ```
 $ python flashing_binaries.py --IP IP1 IP2 IP3 ... IP*
 ```
-
+<br>
 The IPs should be listed like in the given example.
 
 ```
