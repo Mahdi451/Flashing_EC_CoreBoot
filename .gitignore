@@ -2,4 +2,4 @@
 /__pycache__
 
 #ignore .bin files within latest folder
-/latest/*.bin
+*.bin
