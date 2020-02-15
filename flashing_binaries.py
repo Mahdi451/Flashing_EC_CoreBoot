@@ -52,13 +52,13 @@ def find_and_return_latest_binaries(binaries_folder_location):
             file_size = os.path.getsize(file_path)
             print()
             if 500000 < file_size < 600000:
-                print ("file size: %d bytes"%os.path.getsize(file_path))
-                print ("ec file path is: ", file_path)
+                # print ("file size: %d bytes"%os.path.getsize(file_path))
+                # print ("ec file path is: ", file_path)
                 abs_ec_image_path = file_path
                 d["ec"] = abs_ec_image_path
-            if 15000000 < file_size < 17000000:
-                print ("file size: %d bytes"%os.path.getsize(file_path))
-                print ("cb file path is: ", file_path)
+            if 16000000 < file_size:
+                # print ("file size: %d bytes"%os.path.getsize(file_path))
+                # print ("cb file path is: ", file_path)
                 abs_cb_image_path = file_path
                 d["cb"] = abs_cb_image_path
     if not d:
@@ -92,9 +92,9 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
             #ecCmd = "ls -l " + ecImageDest
             ecFlashStatus = test.run_command_to_check_non_zero_exit_status(ecCmd, dut_ip)
             if ecFlashStatus:
-                print("DUT IP: %s\n[Flash Successful]" % dut_ip)
+                print("\nDUT IP: %s\n[Flash Successful]" % dut_ip)
             if not ecFlashStatus:
-                print("DUT IP: %s\n[Flash Unsuccessful]" % dut_ip)
+                print("\nDUT IP: %s\n[Flash Unsuccessful]" % dut_ip)
                 flashDict[dut_ip] = flashing_status
                 resultDict.update(flashDict)
                 return flashDict
@@ -138,8 +138,7 @@ if __name__ == "__main__":
     else:
         print("Binaries are not available. Copy binaries into folder named latest and rerun flashing script!")
         sys.exit(1)
-    print("\nDUT IPs: %s\n"%ip_list)
-    # END IP list given from the cmd line
+    # print("\nDUT IPs: %s\n"%ip_list)
     resultDict = dict()
     # p.apply_async(FlashBinaries(i, resultDict, cbImageSrc = binaryDict["cb"], ecImageSrc = binaryDict["ec"]), ip_list, 1)
     with multiprocessing.Pool(multiprocessing.cpu_count()) as pool:
