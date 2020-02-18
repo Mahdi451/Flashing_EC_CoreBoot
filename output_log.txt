@@ -1,0 +1,49 @@
+
+
+DUT IP: 192.168.1.133 is not live.
+
+DUT IP: 192.168.1.228 is not live.
+
+DUT IP: 192.168.1.146 is not live.
+
+DUT IP: 192.168.1.11 is live.
+
+Command Executed: "ls /tmp/autoflashCB.bin"
+/tmp/autoflashCB.bin
+
+DUT IP: 192.168.1.11
+[Image Copy Successfull]
+
+Command Executed: "flashrom -p host -w /tmp/autoflashCB.bin"
+Calibrating delay loop... OK.
+coreboot table found at 0x76b48000.
+Found chipset "Intel Tigerlake". Enabling flash write... OK.
+FAILED
+This is flashrom related command and flash status can be decided based on flashing only as verification fails most of the time!
+[Flash Unsuccessful]
+
+Command Executed: "ls /tmp/autoflashEC.bin"
+/tmp/autoflashEC.bin
+
+DUT IP: 192.168.1.11
+[Image Copy Successfull]
+
+Command Executed: "flashrom -p ec -w /tmp/autoflashEC.bin"
+Calibrating delay loop... OK.
+coreboot table found at 0x76b48000.
+Found chipset "Intel Tigerlake". Enabling flash write... OK.
+Skip jumping to RO
+Erasing and writing flash chip... SUCCESS
+
+DUT IP: 192.168.1.11
+[Flash Successful]
+
+Checking if DUT IP: 192.168.1.11 is back online.
+
+
+DUT IP: 192.168.1.11 is back online.
+
+*************************************************************
+[{'192.168.1.146': 'FAIL'}, {'192.168.1.228': 'FAIL'}, {'192.168.1.11': 'PASS'}, {'192.168.1.133': 'FAIL'}]
+
+Execution Time: 0m 24s
