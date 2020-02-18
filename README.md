@@ -1,6 +1,6 @@
 # Flashing Binaries
 
-This script will allow you to both copy over and flash both cb/ec bins across multiple platforms.<br>Using the multiprocessing module each flash is executed simultenously with other instances. 
+This script will allow you to both copy over and flash both cb/ec bins across multiple platforms.<br>Using the multiprocessing module each flash is executed simultaneously with other instances. 
 
 
 ## Prerequisites
