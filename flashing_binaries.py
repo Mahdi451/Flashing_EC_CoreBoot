@@ -50,7 +50,7 @@ def find_and_return_latest_binaries(binaries_folder_location):
         if file.endswith(".bin"):
             file_path = os.path.join(binaries_folder_location, file)
             file_size = os.path.getsize(file_path)
-            print()
+            #print()
             if 400000 < file_size < 600000:
                 # print ("file size: %d bytes"%os.path.getsize(file_path))
                 # print ("ec file path is: ", file_path)
@@ -74,7 +74,7 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
     cbFlashStatus = False
     ecFlashStatus = False
     if test.check_if_remote_system_is_live(dut_ip):
-        print("DUT IP: %s is live." % dut_ip)
+        print("\nDUT IP: %s is live." % dut_ip)
         if cbImageSrc:
             cbImageDest = "/tmp/autoflashCB.bin"
             copy_cb = test.copy_file_from_host_to_dut(cbImageSrc, cbImageDest, dut_ip)
@@ -114,7 +114,7 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
             resultDict.update(flashDict)
             return flashDict
     else:
-        print("DUT IP: %s is not live.\n" % dut_ip)
+        print("\nDUT IP: %s is not live." % dut_ip)
     flashDict[dut_ip] = flashing_status
     resultDict.update(flashDict)
     return flashDict   
@@ -128,7 +128,7 @@ if __name__ == "__main__":
         print("Binaries folder doesn't exist. Creating one. Copy binaries into folder named latest and rerun flashing script!")
         createFolders(bin_location)
         sys.exit(1)
-    bin_location = cwd + "/latest"
+    #bin_location = cwd + "/latest"
     binaryDict = find_and_return_latest_binaries(bin_location)
     if binaryDict:
         if not "ec" in binaryDict:
