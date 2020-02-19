@@ -24,6 +24,14 @@ with open(("%s/%s" % (cwd,args.ip))) as f:
         ip_list.append(ip.rstrip())
 
 
+def check_bin_version(dut_ip):
+    cmd1='crossystem | grep fwid'
+    cmd2='ectool version'
+
+    cb_ver=test.run_command_to_check_non_zero_exit_status(cmd1, dut_ip)
+    ec_ver=test.run_command_to_check_non_zero_exit_status(cmd2, dut_ip)
+
+
 def createFolders(absFolderPath):
     try:
         os.makedirs(absFolderPath)
@@ -69,6 +77,7 @@ def find_and_return_latest_binaries(binaries_folder_location):
 
 
 def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
+    check_bin_version(dut_ip)
     flashDict = dict()
     flashing_status = "FAIL"
     cbFlashStatus = False
@@ -82,9 +91,9 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
             #cbCmd = "ls -l " + cbImageDest
             cbFlashStatus = test.run_command_to_check_non_zero_exit_status(cbCmd, dut_ip)
             if cbFlashStatus:
-                print("[Flash Successful]")
+                print("\nDUT IP: %s\n[Flash Successful]" % dut_ip)
             if not cbFlashStatus:
-                print("[Flash Unsuccessful]")
+                print("\nDUT IP: %s\n[Flash Unsuccessful]" % dut_ip)
         if ecImageSrc:
             ecImageDest = "/tmp/autoflashEC.bin"
             copy_ec = test.copy_file_from_host_to_dut(ecImageSrc, ecImageDest, dut_ip)
@@ -99,7 +108,7 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
                 resultDict.update(flashDict)
                 return flashDict
         if cbFlashStatus or ecFlashStatus:
-            test.run_async_command("sleep 2; reboot > /dev/null 2>&1", dut_ip)
+            # test.run_async_command("sleep 2; reboot > /dev/null 2>&1", dut_ip)
             print("\nChecking if DUT IP: %s is back online.\n" % dut_ip)
             time.sleep(3)
             for i in range(60):
@@ -115,6 +124,8 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
             return flashDict
     else:
         print("\nDUT IP: %s is not live." % dut_ip)
+    
+    # check_bin_version(dut_ip)
     flashDict[dut_ip] = flashing_status
     resultDict.update(flashDict)
     return flashDict   

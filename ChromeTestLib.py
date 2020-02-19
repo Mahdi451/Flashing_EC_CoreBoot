@@ -49,13 +49,13 @@ class ChromeTestLib(object):
                 client.close()
                 print(out)
                 if command_exit_status == 0:
-                    #print ("exit status is 0")
-                    #print(stdout.readline)
-                    #print("\nFlash Successful.")
+                    if "Skip jumping to RO" in out:
+                        print("***Not flashed properly and must be completed using Servo.")
+                        return False
                     return True
                 elif "flashrom" in command:
-                    print ("This is flashrom related command and flash status can be decided based on flashing only as verification fails most of the time!")
-                    if "Erasing and writing flash chip... Verifying flash" in out:
+                    print("***This is flashrom related command and flash status can be decided \nbased on flashing only as verification fails most of the time!")
+                    if "Erasing and writing flash chip" in out:
                         return True
                     else:
                         return False
