@@ -26,8 +26,6 @@ class ChromeTestLib(object):
         cmd1='crossystem | grep fwid | awk \'{print $3}\''
         cmd2='ectool version | awk \'NR==1,NR==2{print $3}\''
 
-
-
         stdin, stdout, stderr = client.exec_command(cmd1)
         command_exit_status = stdout.channel.recv_exit_status()
         cb_ver = stdout.read().decode('utf-8').strip("\n")
@@ -44,7 +42,6 @@ class ChromeTestLib(object):
         print("--------------------------")
 
         client.close()
-
         return cb_ver, ec_ver
 
 
