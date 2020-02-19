@@ -1,10 +1,11 @@
 
-import re, os, platform, paramiko
+import re, os, platform
+import subprocess, paramiko
 
 class ChromeTestLib(object):
 
-    def check_if_remote_system_is_live(self, ip):
-        host = ip
+    def check_if_remote_system_is_live(self, dut_ip):
+        host = dut_ip
         try:
             # response = os.system("ping -c 1 " + hostname)
             response=subprocess.call(('ping -c 1 %s;' % host),
@@ -15,6 +16,36 @@ class ChromeTestLib(object):
             return True
         else:
             return False
+
+
+    def check_bin_version(self, dut_ip):
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(dut_ip, username = "root", password = "test0000")
+
+        cmd1='crossystem | grep fwid | awk \'{print $3}\''
+        cmd2='ectool version | awk \'NR==1,NR==2{print $3}\''
+
+
+
+        stdin, stdout, stderr = client.exec_command(cmd1)
+        command_exit_status = stdout.channel.recv_exit_status()
+        cb_ver = stdout.read().decode('utf-8').strip("\n")
+        print("\nDUT IP: %s" % dut_ip)
+        print("--------------------------")
+        print("CB Version:")
+        print(cb_ver)
+        print("--------------------------")
+        stdin, stdout, stderr = client.exec_command(cmd2)
+        command_exit_status = stdout.channel.recv_exit_status()
+        ec_ver = stdout.read().decode('utf-8').strip("\n")
+        print("EC Version:")
+        print(ec_ver)
+        print("--------------------------")
+
+        client.close()
+
+        return cb_ver, ec_ver
 
 
     def copy_file_from_host_to_dut(self, src, dst, dut_ip):
@@ -51,7 +82,6 @@ class ChromeTestLib(object):
                 if command_exit_status == 0:
                     if "Skip jumping to RO" in out:
                         print("***Not flashed properly and must be completed using Servo.")
-                        return False
                     return True
                 elif "flashrom" in command:
                     print("***This is flashrom related command and flash status can be decided \nbased on flashing only as verification fails most of the time!")
