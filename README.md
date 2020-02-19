@@ -25,7 +25,7 @@ ChromeTestLib.py  flashing_binaries.py  IPs.txt  latest  README.md  requirements
 After that insert the IPs you would like to flash into *__IPs.txt__* and you are ready to run the script!
 
 ```
-$ python flashing_binaries.py |& tee output_log.txt
+$ python flashing_binaries.py
 ```
 
 
