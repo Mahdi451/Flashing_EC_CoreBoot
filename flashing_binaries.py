@@ -1,7 +1,7 @@
 
-import os, sys, time, argparse
-import tarfile, glob, shlex
 import multiprocessing
+import tarfile, glob, shlex
+import os, sys, time, argparse
 
 from functools import partial
 from collections import defaultdict
@@ -83,9 +83,9 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
             #cbCmd = "ls -l " + cbImageDest
             cbFlashStatus = test.run_command_to_check_non_zero_exit_status(cbCmd, dut_ip)
             if cbFlashStatus:
-                print("\nDUT IP: %s\n[Flash Successful]" % dut_ip)
+                print("\nDUT IP: %s\n[CB Flash Successful]" % dut_ip)
             if not cbFlashStatus:
-                print("\nDUT IP: %s\n[Flash Unsuccessful]" % dut_ip)
+                print("\nDUT IP: %s\n[CB Flash Unsuccessful]" % dut_ip)
         if ecImageSrc:
             ecImageDest = "/tmp/autoflashEC.bin"
             copy_ec = test.copy_file_from_host_to_dut(ecImageSrc, ecImageDest, dut_ip)
@@ -93,9 +93,9 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
             #ecCmd = "ls -l " + ecImageDest
             ecFlashStatus = test.run_command_to_check_non_zero_exit_status(ecCmd, dut_ip)
             if ecFlashStatus:
-                print("\nDUT IP: %s\n[Flash Successful]" % dut_ip)
+                print("\nDUT IP: %s\n[EC Flash Successful]" % dut_ip)
             if not ecFlashStatus:
-                print("\nDUT IP: %s\n[Flash Unsuccessful]" % dut_ip)
+                print("\nDUT IP: %s\n[EC Flash Unsuccessful]" % dut_ip)
                 flashDict[dut_ip] = flashing_status
                 resultDict.update(flashDict)
                 after_flash=test.check_bin_version(dut_ip) ####
@@ -108,7 +108,7 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
                 return flashDict
         if cbFlashStatus or ecFlashStatus:
             """ this is required for the reboot part of flash """
-            # test.run_async_command("sleep 2; reboot > /dev/null 2>&1", dut_ip)
+            test.run_async_command("sleep 2; reboot > /dev/null 2>&1", dut_ip)
             print("\nPinging DUT IP: %s" % dut_ip)
             time.sleep(3)
             for i in range(60):
@@ -131,7 +131,7 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
             return flashDict
     else:
         print("\nDUT IP: %s is not live." % dut_ip)
-        
+
     flashDict[dut_ip] = flashing_status
     resultDict.update(flashDict)
     after_flash=test.check_bin_version(dut_ip) ####
