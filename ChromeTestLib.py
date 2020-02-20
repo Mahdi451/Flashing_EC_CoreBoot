@@ -26,10 +26,10 @@ class ChromeTestLib(object):
         cmd1='crossystem | grep fwid | awk \'{print $1,$2,$3}\''
         cmd2='ectool version | awk \'NR==1,NR==2{print $1,$2,$3}\''
 
+        print("\nDUT IP: %s" % dut_ip)
         stdin, stdout, stderr = client.exec_command(cmd1)
         command_exit_status = stdout.channel.recv_exit_status()
         cb_ver = stdout.read().decode('utf-8').strip("\n")
-        print("\nDUT IP: %s" % dut_ip)
         print("--------------------------")
         print("CB Version:")
         print(cb_ver)
