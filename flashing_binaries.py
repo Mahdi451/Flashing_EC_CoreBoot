@@ -37,6 +37,15 @@ def createFolders(absFolderPath):
         sys.exit(1)
 
 
+def comparing_versions(before_flash, after_flash, dut_ip):
+    if ((before_flash[0] == after_flash[0]) and (before_flash[1] == after_flash[1])):
+        print("\nDUT IP: %s  No changes were made to CB or EC." % dut_ip)
+    elif ((before_flash[0] != after_flash[0]) and (before_flash[1] == after_flash[1])):
+        print("\nDUT IP: %s  Changes were made to CB but not EC." % dut_ip)
+    elif ((before_flash[0] == after_flash[0]) and (before_flash[1] != after_flash[1])):
+        print("\nDUT IP: %s  Changes were made to EC but not CB." % dut_ip)
+
+
 def find_and_return_latest_binaries(binaries_folder_location):
     d = dict()
     try:
@@ -90,6 +99,8 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
             ecImageDest = "/tmp/autoflashEC.bin"
             copy_ec = test.copy_file_from_host_to_dut(ecImageSrc, ecImageDest, dut_ip)
             ecCmd = "flashrom -p ec -w " + ecImageDest
+            # "flashrom -p ec -w " + ecImageDest + " -i RO_EC"
+            # "flashrom -p ec -w " + ecImageDest + " -i RW_EC"
             #ecCmd = "ls -l " + ecImageDest
             ecFlashStatus = test.run_command_to_check_non_zero_exit_status(ecCmd, dut_ip)
             if ecFlashStatus:
@@ -99,16 +110,11 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
                 flashDict[dut_ip] = flashing_status
                 resultDict.update(flashDict)
                 after_flash=test.check_bin_version(dut_ip) ####
-                if ((before_flash[0] == after_flash[0]) and (before_flash[1] == after_flash[1])):
-                    print("\nDUT IP: %s  No changes were made to CB or EC." % dut_ip)
-                elif ((before_flash[0] != after_flash[0]) and (before_flash[1] == after_flash[1])):
-                    print("\nDUT IP: %s  Changes were made to CB but not EC." % dut_ip)
-                elif ((before_flash[0] == after_flash[0]) and (before_flash[1] != after_flash[1])):
-                    print("\nDUT IP: %s  Changes were made to EC but not CB." % dut_ip)
+                comparing_versions(before_flash, after_flash, dut_ip)
                 return flashDict
         if cbFlashStatus or ecFlashStatus:
             """ this is required for the reboot part of flash """
-            test.run_async_command("sleep 2; reboot > /dev/null 2>&1", dut_ip)
+            # test.run_async_command("sleep 2; reboot > /dev/null 2>&1", dut_ip)
             print("\nPinging DUT IP: %s" % dut_ip)
             time.sleep(3)
             for i in range(60):
@@ -118,12 +124,7 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
                     flashDict[dut_ip] = flashing_status
                     print("\nDUT IP: %s is back online." % dut_ip)
                     after_flash=test.check_bin_version(dut_ip) ####
-                    if ((before_flash[0] == after_flash[0]) and (before_flash[1] == after_flash[1])):
-                        print("\nDUT IP: %s  No changes were made to CB or EC." % dut_ip)
-                    elif ((before_flash[0] != after_flash[0]) and (before_flash[1] == after_flash[1])):
-                        print("\nDUT IP: %s  Changes were made to CB but not EC." % dut_ip)
-                    elif ((before_flash[0] == after_flash[0]) and (before_flash[1] != after_flash[1])):
-                        print("\nDUT IP: %s  Changes were made to EC but not CB." % dut_ip)
+                    comparing_versions(before_flash, after_flash, dut_ip)
                     return flashDict
                 time.sleep(2)
             flashDict[dut_ip] = flashing_status
@@ -131,16 +132,10 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
             return flashDict
     else:
         print("\nDUT IP: %s is not live." % dut_ip)
-
     flashDict[dut_ip] = flashing_status
     resultDict.update(flashDict)
     after_flash=test.check_bin_version(dut_ip) ####
-    if ((before_flash[0] == after_flash[0]) and (before_flash[1] == after_flash[1])):
-        print("\nDUT IP: %s  No changes were made to CB or EC." % dut_ip)
-    elif ((before_flash[0] != after_flash[0]) and (before_flash[1] == after_flash[1])):
-        print("\nDUT IP: %s  Changes were made to CB but not EC." % dut_ip)
-    elif ((before_flash[0] == after_flash[0]) and (before_flash[1] != after_flash[1])):
-        print("\nDUT IP: %s  Changes were made to EC but not CB." % dut_ip)
+    ccomparing_versions(before_flash, after_flash, dut_ip)
     return flashDict   
 
 

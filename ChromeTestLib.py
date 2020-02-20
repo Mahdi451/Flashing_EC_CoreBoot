@@ -1,13 +1,13 @@
 
 import re, os, platform
 import subprocess, paramiko
+from smtplib import SMTP
 
 class ChromeTestLib(object):
 
     def check_if_remote_system_is_live(self, dut_ip):
         host = dut_ip
         try:
-            # response = os.system("ping -c 1 " + hostname)
             response=subprocess.call(('ping -c 1 %s;' % host),
             stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
         except:
@@ -44,6 +44,9 @@ class ChromeTestLib(object):
         print(ec_ver)
         print("--------------------------")
 
+        # python yourScript.py | mail -s outputFromScript your@email.address
+        # sendmail username@email.com < /path/to/.txt
+
         client.close()
         return cb_ver, ec_ver
 
@@ -57,17 +60,17 @@ class ChromeTestLib(object):
         sftp.put(src, dst)		
         sftp.close()
 
-        if self.run_command_to_check_non_zero_exit_status("ls " + dst, dut_ip):	
-            print ("\nDUT IP: %s\n[Image Copy Successfull]" % dut_ip)	
+        if self.run_command_to_check_non_zero_exit_status(command="",dut_ip=dut_ip):	
+            print ("DUT IP: %s\n[Image Copy Successfull]\n" % dut_ip)	
             return True
         else:
-            print ("\nDUT IP: %s\n[Image Copy Unsuccessfull]" % dut_ip)	
+            print ("DUT IP: %s\n[Image Copy Unsuccessfull]\n" % dut_ip)	
             return False
 
 
     def run_command_to_check_non_zero_exit_status(self, command, dut_ip, username = "root", password = "test0000"):
         if self.check_if_remote_system_is_live(dut_ip):
-            print ("\nCommand Executed: \"%s\"" % command)
+            # print ("\nCommand Executed: \"%s\"" % command)
             try:
                 client = paramiko.SSHClient()
                 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -75,9 +78,11 @@ class ChromeTestLib(object):
                 stdin, stdout, stderr = client.exec_command(command)
                 command_exit_status = stdout.channel.recv_exit_status()
                 out = stdout.read().decode('utf-8').strip("\n")
-                #print ('This is output = %s'%stdout.read())
-                #print ('This is error = %s'%stderr.read())
+                #print ('This is output = %s' % stdout.read())
+                """ print ('This is error = %s' % stderr.read()) """
                 client.close()
+                # print("**************************")
+                # print("DUT IP: %s\n" %(dut_ip))
                 print(out)
                 if command_exit_status == 0:
                     if "Skip jumping to RO" in out:
@@ -97,9 +102,9 @@ class ChromeTestLib(object):
                 print ("Failed EOFError")
         return False
 
+
     def run_async_command(self, command, dut_ip, username = "root", password = "test0000"):
         if self.check_if_remote_system_is_live(dut_ip):
-            #print ("command is %s" % command)
             try:
                 client = paramiko.SSHClient()
                 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -116,10 +121,6 @@ class ChromeTestLib(object):
         return False
 
 
-
-
-
-
     """ def check_if_system_is_a_chrome_os_system(self, ip):
         chromeos_detection_cmd = "cat /etc/lsb-release | grep -i chromeos_release_name"
         output = self.run_command_to_check_non_zero_exit_status(chromeos_detection_cmd, ip)
@@ -128,7 +129,6 @@ class ChromeTestLib(object):
             chrome_os_check = re.findall("chrome os|chromium os", output, re.I)
         else:
             return False
-
         if chrome_os_check:
             return True
         else:
@@ -142,7 +142,6 @@ class ChromeTestLib(object):
                 log_file_path = "/tmp/" + ip + "_generate_log.tgz"
                 if self.run_command_to_check_non_zero_exit_status("ls -l " + log_file_path, ip):
                     self.run_command_to_check_non_zero_exit_status("rm -rf " + log_file_path, ip)
-
                 cmd = "generate_logs --output=" + log_file_path
                 generate_log_status = self.run_command_to_check_non_zero_exit_status(cmd, ip)
                 print ("generate_log_status is:", generate_log_status)
@@ -155,7 +154,6 @@ class ChromeTestLib(object):
                         return log_file_path
             else:
                 print ("remote system is not a chromeos device")
-
         else:
             print ("DUT %s is not up" % ip)
 
@@ -169,7 +167,6 @@ class ChromeTestLib(object):
                 log_file_path = "/tmp/" + ip + "_generate_log.tgz"
                 if self.run_command_to_check_non_zero_exit_status("ls -l " + log_file_path, ip):
                     self.run_command_to_check_non_zero_exit_status("rm -rf " + log_file_path, ip)
-
                 cmd = "generate_logs --output=" + log_file_path
                 generate_log_status = self.run_command_to_check_non_zero_exit_status(cmd, ip)
                 print ("generate_log_status is:", generate_log_status)
@@ -182,11 +179,10 @@ class ChromeTestLib(object):
                         return log_file_path
             else:
                 print ("remote system is not a chromeos device")
-
         else:
             print ("DUT %s is not up" % ip)
-
         return False """
+
 
     """ def copy_file_from_dut_to_host(self, src, dst, dut_ip):
         client = paramiko.SSHClient()
