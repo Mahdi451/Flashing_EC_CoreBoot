@@ -23,8 +23,8 @@ class ChromeTestLib(object):
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         client.connect(dut_ip, username = "root", password = "test0000")
 
-        cmd1='crossystem | grep fwid | awk \'{print $3}\''
-        cmd2='ectool version | awk \'NR==1,NR==2{print $3}\''
+        cmd1='crossystem | grep fwid | awk \'{print $1,$2,$3}\''
+        cmd2='ectool version | awk \'NR==1,NR==2{print $1,$2,$3}\''
 
         stdin, stdout, stderr = client.exec_command(cmd1)
         command_exit_status = stdout.channel.recv_exit_status()
