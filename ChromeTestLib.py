@@ -44,8 +44,9 @@ class ChromeTestLib(object):
         print(ec_ver)
         print("--------------------------")
 
-        # python yourScript.py | mail -s outputFromScript your@email.address
-        # sendmail username@email.com < /path/to/.txt
+        # python flashing_binaries.py | mail -s "CB/EC Flash Results" bokore@gmail.com
+        # sendmail bokore@gmail.com < mail.txt 
+        
 
         client.close()
         return cb_ver, ec_ver

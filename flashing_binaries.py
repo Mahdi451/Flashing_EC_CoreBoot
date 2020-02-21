@@ -37,6 +37,10 @@ def createFolders(absFolderPath):
         sys.exit(1)
 
 
+def mailing_results(before_flash,email):
+    os.system("mail -s \"CB/EC Flash Results\" %s " % email)
+
+
 def comparing_versions(before_flash, after_flash, dut_ip):
     if ((before_flash[0] == after_flash[0]) and (before_flash[1] == after_flash[1])):
         print("\nDUT IP: %s  No changes were made to CB or EC." % dut_ip)
@@ -77,7 +81,7 @@ def find_and_return_latest_binaries(binaries_folder_location):
         return d
 
 
-def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
+def FlashBinaries(dut_ip, email, cbImageSrc = "", ecImageSrc = ""):
     flashDict = dict()
     flashing_status = "FAIL"
     cbFlashStatus = False
@@ -85,6 +89,7 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
     if test.check_if_remote_system_is_live(dut_ip):
         print("DUT IP: %s is live." % dut_ip)
         before_flash=test.check_bin_version(dut_ip) ####
+        mailing_results(before_flash,email)
         if cbImageSrc:
             cbImageDest = "/tmp/autoflashCB.bin"
             copy_cb = test.copy_file_from_host_to_dut(cbImageSrc, cbImageDest, dut_ip)
@@ -140,6 +145,7 @@ def FlashBinaries(dut_ip, cbImageSrc = "", ecImageSrc = ""):
 
 
 if __name__ == "__main__":
+    email=input("Please enter an E-mail: ")
     t1=time.perf_counter()
     flash_ec = flash_cb = False
     #CHECK if destination folder exist else exit
@@ -161,10 +167,13 @@ if __name__ == "__main__":
     resultDict = dict()
     # p.apply_async(FlashBinaries(i, resultDict, cbImageSrc = binaryDict["cb"], ecImageSrc = binaryDict["ec"]), ip_list, 1)
     with multiprocessing.Pool(multiprocessing.cpu_count()) as pool:
-        resultDict=pool.map(partial(FlashBinaries,cbImageSrc = binaryDict["cb"],
+        resultDict=pool.map(partial(FlashBinaries,email=email,cbImageSrc = binaryDict["cb"],
             ecImageSrc = binaryDict["ec"]), ip_list)
     print ("\n************************************************************************")
-    print(resultDict)         
+    print(resultDict)  
+
+    mailing_results(email)
+
     t2=time.perf_counter()
     tot=t2-t1
     minutes=tot/60
