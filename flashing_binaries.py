@@ -8,6 +8,7 @@ from collections import defaultdict
 from scapy.all import srp, Ether, ARP, conf
 from ChromeTestLib import ChromeTestLib
 
+# script_dir = os.getcwd()
 cwd = os.getcwd()
 bin_location = cwd + "/latest"
 #print (bin_location)
@@ -37,8 +38,8 @@ def createFolders(absFolderPath):
         sys.exit(1)
 
 
-def mailing_results(before_flash,email):
-    os.system("mail -s \"CB/EC Flash Results\" %s " % email)
+def mailing_results(cwd,email,dut_ip):
+    os.system("mail -s \"DUT IP: %s Flash Results\" %s < %s/flash_info.txt" % (dut_ip,email,cwd))
 
 
 def comparing_versions(before_flash, after_flash, dut_ip):
@@ -89,7 +90,6 @@ def FlashBinaries(dut_ip, email, cbImageSrc = "", ecImageSrc = ""):
     if test.check_if_remote_system_is_live(dut_ip):
         print("DUT IP: %s is live." % dut_ip)
         before_flash=test.check_bin_version(dut_ip) ####
-        mailing_results(before_flash,email)
         if cbImageSrc:
             cbImageDest = "/tmp/autoflashCB.bin"
             copy_cb = test.copy_file_from_host_to_dut(cbImageSrc, cbImageDest, dut_ip)
@@ -116,6 +116,15 @@ def FlashBinaries(dut_ip, email, cbImageSrc = "", ecImageSrc = ""):
                 resultDict.update(flashDict)
                 after_flash=test.check_bin_version(dut_ip) ####
                 comparing_versions(before_flash, after_flash, dut_ip)
+                with open('%s/flash_info.txt' % cwd, 'w') as f:
+                    str1='\n'.join(before_flash)
+                    str2='\n'.join(after_flash)
+                    f.write("DUT IP: %s\n" % dut_ip)
+                    f.write("---------------------")
+                    f.write("\nBefore Flash:\n%s" % str1)
+                    f.write("\nAfter Flash:\n%s" % str2)
+                    f.write("\n")
+                mailing_results(cwd,email,dut_ip)
                 return flashDict
         if cbFlashStatus or ecFlashStatus:
             """ this is required for the reboot part of flash """
@@ -130,6 +139,15 @@ def FlashBinaries(dut_ip, email, cbImageSrc = "", ecImageSrc = ""):
                     print("\nDUT IP: %s is back online." % dut_ip)
                     after_flash=test.check_bin_version(dut_ip) ####
                     comparing_versions(before_flash, after_flash, dut_ip)
+                    with open('%s/flash_info.txt' % cwd, 'w') as f:
+                        str1='\n'.join(before_flash)
+                        str2='\n'.join(after_flash)
+                        f.write("DUT IP: %s\n" % dut_ip)
+                        f.write("---------------------")
+                        f.write("\nBefore Flash:\n%s" % str1)
+                        f.write("\nAfter Flash:\n%s" % str2)
+                        f.write("\n")
+                    mailing_results(cwd,email,dut_ip)
                     return flashDict
                 time.sleep(2)
             flashDict[dut_ip] = flashing_status
@@ -140,7 +158,16 @@ def FlashBinaries(dut_ip, email, cbImageSrc = "", ecImageSrc = ""):
     flashDict[dut_ip] = flashing_status
     resultDict.update(flashDict)
     after_flash=test.check_bin_version(dut_ip) ####
-    ccomparing_versions(before_flash, after_flash, dut_ip)
+    comparing_versions(before_flash, after_flash, dut_ip)
+    with open('%s/flash_info.txt' % cwd, 'w') as f:
+        str1='\n'.join(before_flash)
+        str2='\n'.join(after_flash)
+        f.write("DUT IP: %s\n" % dut_ip)
+        f.write("---------------------")
+        f.write("\nBefore Flash:\n%s" % str1)
+        f.write("\nAfter Flash:\n%s" % str2)
+        f.write("\n")
+    mailing_results(cwd,email,dut_ip)
     return flashDict   
 
 
@@ -171,9 +198,6 @@ if __name__ == "__main__":
             ecImageSrc = binaryDict["ec"]), ip_list)
     print ("\n************************************************************************")
     print(resultDict)  
-
-    mailing_results(email)
-
     t2=time.perf_counter()
     tot=t2-t1
     minutes=tot/60
