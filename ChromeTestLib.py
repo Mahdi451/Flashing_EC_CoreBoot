@@ -3,6 +3,8 @@ import re, os, platform
 import subprocess, paramiko
 from smtplib import SMTP
 
+global cmd_output
+
 class ChromeTestLib(object):
 
     def check_if_remote_system_is_live(self, dut_ip):
@@ -18,38 +20,29 @@ class ChromeTestLib(object):
             return False
 
 
-    def check_bin_version(self, dut_ip):
-        client = paramiko.SSHClient()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(dut_ip, username = "root", password = "test0000")
+    def comparing_versions(self,before_flash, after_flash, dut_ip):
+        if ((before_flash[0] == after_flash[0]) and (before_flash[1] == after_flash[1])):
+            print("\nDUT IP: %s  No changes were made to CB or EC." % dut_ip)
+        elif ((before_flash[0] != after_flash[0]) and (before_flash[1] == after_flash[1])):
+            print("\nDUT IP: %s  Changes were made to CB but not EC." % dut_ip)
+        elif ((before_flash[0] == after_flash[0]) and (before_flash[1] != after_flash[1])):
+            print("\nDUT IP: %s  Changes were made to EC but not CB." % dut_ip)
 
-        cmd1='crossystem | grep fwid | awk \'{print $1,$2,$3}\''
-        cmd2='ectool version | awk \'NR==1,NR==2{print $1,$2,$3}\''
 
-        # cmd1='crossystem | grep fwid | awk \'{print $3}\''
-        # cmd2='ectool version | awk \'NR==1,NR==2{print $3}\''
-
-        # print("\nDUT IP: %s" % dut_ip)
-        stdin, stdout, stderr = client.exec_command(cmd1)
-        command_exit_status = stdout.channel.recv_exit_status()
-        cb_ver = stdout.read().decode('utf-8').strip("\n")
-        # print("--------------------------")
-        # print("CB Version:")
-        # print(cb_ver)
-        # print("--------------------------")
-        stdin, stdout, stderr = client.exec_command(cmd2)
-        command_exit_status = stdout.channel.recv_exit_status()
-        ec_ver = stdout.read().decode('utf-8').strip("\n")
-        # print("EC Version:")
-        # print(ec_ver)
-        # print("--------------------------")
-
-        # python flashing_binaries.py | mail -s "CB/EC Flash Results" bokore@gmail.com
-        # sendmail bokore@gmail.com < mail.txt 
-        
-
-        client.close()
-        return cb_ver, ec_ver
+    def mailing_results(self,before_flash,after_flash,dut_ip,cwd,email):
+        with open('%s/flash_info.txt' % cwd, 'a') as f:
+            str1='\n'.join(before_flash)
+            str2='\n'.join(after_flash)
+            f.write("DUT IP: %s" % dut_ip)
+            f.write("\n---------------------")
+            f.write("\nBefore Flash:\n%s" % str1)
+            f.write("\n---------------------")
+            f.write("\nAfter Flash:\n%s" % str2)
+            f.write("\n\n")
+    """ 
+    python flashing_binaries.py | mail -s "CB/EC Flash Results" bokore@gmail.com
+    sendmail bokore@gmail.com < mail.txt  
+    """
 
 
     def copy_file_from_host_to_dut(self, src, dst, dut_ip):
@@ -70,8 +63,8 @@ class ChromeTestLib(object):
 
 
     def run_command_to_check_non_zero_exit_status(self, command, dut_ip, username = "root", password = "test0000"):
+        global cmd_output
         if self.check_if_remote_system_is_live(dut_ip):
-            # print ("\nCommand Executed: \"%s\"" % command)
             try:
                 client = paramiko.SSHClient()
                 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -79,12 +72,10 @@ class ChromeTestLib(object):
                 stdin, stdout, stderr = client.exec_command(command)
                 command_exit_status = stdout.channel.recv_exit_status()
                 out = stdout.read().decode('utf-8').strip("\n")
-                #print ('This is output = %s' % stdout.read())
                 """ print ('This is error = %s' % stderr.read()) """
                 client.close()
-                # print("**************************")
-                # print("DUT IP: %s\n" %(dut_ip))
-                print(out)
+                cmd_output = out
+                # print(out)
                 if command_exit_status == 0:
                     if "Skip jumping to RO" in out:
                         print("***Not flashed properly and must be completed using Servo.")
@@ -102,6 +93,19 @@ class ChromeTestLib(object):
             except EOFError:
                 print ("Failed EOFError")
         return False
+
+
+    def check_bin_version(self, dut_ip):
+        global cmd_output
+        cmd1='crossystem | grep fwid | awk \'{print $1,$2,$3}\''
+        cmd2='ectool version | awk \'NR==1,NR==2{print $1,$2,$3}\''
+
+        self.run_command_to_check_non_zero_exit_status(cmd1,dut_ip)
+        cb_ver = cmd_output
+        self.run_command_to_check_non_zero_exit_status(cmd2,dut_ip)
+        ec_ver = cmd_output
+
+        return cb_ver, ec_ver
 
 
     def run_async_command(self, command, dut_ip, username = "root", password = "test0000"):
