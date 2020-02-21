@@ -1,4 +1,3 @@
-
 import re, os, platform
 import subprocess, paramiko
 from smtplib import SMTP
@@ -19,31 +18,35 @@ class ChromeTestLib(object):
         else:
             return False
 
-
     def comparing_versions(self,before_flash, after_flash, dut_ip):
         if ((before_flash[0] == after_flash[0]) and (before_flash[1] == after_flash[1])):
-            print("\nDUT IP: %s  No changes were made to CB or EC." % dut_ip)
+            print("DUT IP: %s  No changes were made to CB or EC.\n" % dut_ip)
         elif ((before_flash[0] != after_flash[0]) and (before_flash[1] == after_flash[1])):
-            print("\nDUT IP: %s  Changes were made to CB but not EC." % dut_ip)
+            print("DUT IP: %s  Changes were made to CB but not EC.\n" % dut_ip)
         elif ((before_flash[0] == after_flash[0]) and (before_flash[1] != after_flash[1])):
-            print("\nDUT IP: %s  Changes were made to EC but not CB." % dut_ip)
+            print("DUT IP: %s  Changes were made to EC but not CB.\n" % dut_ip)
 
-
-    def mailing_results(self,before_flash,after_flash,dut_ip,cwd,email):
+    def storing_results(self, before_flash, after_flash, dut_ip, cwd):
         with open('%s/flash_info.txt' % cwd, 'a') as f:
             str1='\n'.join(before_flash)
             str2='\n'.join(after_flash)
             f.write("DUT IP: %s" % dut_ip)
             f.write("\n---------------------")
-            f.write("\nBefore Flash:\n%s" % str1)
+            f.write("\nPrevious Versions:\n%s" % str1)
             f.write("\n---------------------")
-            f.write("\nAfter Flash:\n%s" % str2)
+            f.write("\nCurrent Versions:\n%s" % str2)
             f.write("\n\n")
-    """ 
-    python flashing_binaries.py | mail -s "CB/EC Flash Results" bokore@gmail.com
-    sendmail bokore@gmail.com < mail.txt  
-    """
+            f.close()
+    
+    def adding_to_results(self, input, cwd):
+        with open('%s/flash_info.txt' % cwd, 'a') as f:
+            f.write("************************************************\n")
+            f.write(str(input)) 
+            f.close()
 
+    def mailing_results(self, cwd, email):
+        os.system("mail -s \"CB/EC Flash Results\" %s < %s/flash_info.txt" % (email,cwd))
+        os.remove("%s/flash_info.txt" % cwd)
 
     def copy_file_from_host_to_dut(self, src, dst, dut_ip):
         client = paramiko.SSHClient()
@@ -55,12 +58,11 @@ class ChromeTestLib(object):
         sftp.close()
 
         if self.run_command_to_check_non_zero_exit_status(command="",dut_ip=dut_ip):	
-            print ("DUT IP: %s\n[Image Copy Successfull]\n" % dut_ip)	
+            print ("DUT IP: %s [Image Copy Successfull]\n" % dut_ip)	
             return True
         else:
-            print ("DUT IP: %s\n[Image Copy Unsuccessfull]\n" % dut_ip)	
+            print ("DUT IP: %s [Image Copy Unsuccessfull]\n" % dut_ip)	
             return False
-
 
     def run_command_to_check_non_zero_exit_status(self, command, dut_ip, username = "root", password = "test0000"):
         global cmd_output
@@ -75,13 +77,14 @@ class ChromeTestLib(object):
                 """ print ('This is error = %s' % stderr.read()) """
                 client.close()
                 cmd_output = out
-                # print(out)
                 if command_exit_status == 0:
                     if "Skip jumping to RO" in out:
-                        print("***Not flashed properly and must be completed using Servo.")
+                        print("[[Not flashed properly and must be completed using Servo]]")
+                        return False
                     return True
                 elif "flashrom" in command:
-                    print("***This is flashrom related command and flash status can be decided \nbased on flashing only as verification fails most of the time!")
+                    print("[[This is flashrom related command and flash status can be decided" 
+                    + "\nbased on flashing only as verification fails most of the time]]")
                     if "Erasing and writing flash chip" in out:
                         return True
                     else:
@@ -107,7 +110,6 @@ class ChromeTestLib(object):
 
         return cb_ver, ec_ver
 
-
     def run_async_command(self, command, dut_ip, username = "root", password = "test0000"):
         if self.check_if_remote_system_is_live(dut_ip):
             try:
@@ -124,6 +126,8 @@ class ChromeTestLib(object):
             except EOFError:
                 print ("Failed EOFError")
         return False
+
+
 
 
     """ def check_if_system_is_a_chrome_os_system(self, ip):

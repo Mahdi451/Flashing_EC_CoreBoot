@@ -1,4 +1,3 @@
-
 import multiprocessing
 import tarfile, glob, shlex
 import os, sys, time, argparse
@@ -10,10 +9,8 @@ from ChromeTestLib import ChromeTestLib
 
 cwd = os.getcwd()
 bin_location = cwd + "/latest"
-#print (bin_location)
 test = ChromeTestLib()
 parser = argparse.ArgumentParser()
-#parser.add_argument('--IP', dest='ip_addresses', help='provide remote system IPs', nargs='+')
 parser.add_argument('--IP',dest='ip',nargs='?',type=str,metavar=('IP_list.txt'),default='IPs.txt',help='list of IPs to flash')
 args = parser.parse_args()
 
@@ -22,7 +19,7 @@ with open(("%s/%s" % (cwd,args.ip))) as f:
     ip_lines=f.readlines()
     for ip in ip_lines:
         ip_list.append(ip.rstrip())
-
+    f.close()
 
 def createFolders(absFolderPath):
     try:
@@ -35,7 +32,6 @@ def createFolders(absFolderPath):
         print ("Exception found!!!")
         print (e)
         sys.exit(1)
-
 
 def find_and_return_latest_binaries(binaries_folder_location):
     d = dict()
@@ -67,7 +63,6 @@ def find_and_return_latest_binaries(binaries_folder_location):
     else:
         return d
 
-
 def FlashBinaries(dut_ip, email, cbImageSrc = "", ecImageSrc = ""):
     flashDict = dict()
     flashing_status = "FAIL"
@@ -75,75 +70,81 @@ def FlashBinaries(dut_ip, email, cbImageSrc = "", ecImageSrc = ""):
     ecFlashStatus = False
     if test.check_if_remote_system_is_live(dut_ip):
         print("DUT IP: %s is live.\n" % dut_ip)
-        before_flash=test.check_bin_version(dut_ip) ####
+        before_flash=test.check_bin_version(dut_ip) 
+
         if cbImageSrc:
             cbImageDest = "/tmp/autoflashCB.bin"
             copy_cb = test.copy_file_from_host_to_dut(cbImageSrc, cbImageDest, dut_ip)
             cbCmd = "flashrom -p host -w " + cbImageDest
-            #cbCmd = "ls -l " + cbImageDest
             cbFlashStatus = test.run_command_to_check_non_zero_exit_status(cbCmd, dut_ip)
             if cbFlashStatus:
-                print("DUT IP: %s\n[CB Flash Successful]\n" % dut_ip)
+                print("DUT IP: %s [CB Flash Successful]\n" % dut_ip)
             if not cbFlashStatus:
-                print("DUT IP: %s\n[CB Flash Unsuccessful]\n" % dut_ip)
+                print("DUT IP: %s [CB Flash Unsuccessful]\n" % dut_ip)
+
         if ecImageSrc:
             ecImageDest = "/tmp/autoflashEC.bin"
             copy_ec = test.copy_file_from_host_to_dut(ecImageSrc, ecImageDest, dut_ip)
             ecCmd = "flashrom -p ec -w " + ecImageDest
-            # "flashrom -p ec -w " + ecImageDest + " -i RO_EC"
-            # "flashrom -p ec -w " + ecImageDest + " -i RW_EC"
-            #ecCmd = "ls -l " + ecImageDest
             ecFlashStatus = test.run_command_to_check_non_zero_exit_status(ecCmd, dut_ip)
             if ecFlashStatus:
-                print("DUT IP: %s\n[EC Flash Successful]\n" % dut_ip)
+                print("DUT IP: %s [EC Flash Successful]\n" % dut_ip)
             if not ecFlashStatus:
-                print("DUT IP: %s\n[EC Flash Unsuccessful]\n" % dut_ip)
+                print("DUT IP: %s [EC Flash Unsuccessful]\n" % dut_ip)
+
                 flashDict[dut_ip] = flashing_status
                 resultDict.update(flashDict)
-                after_flash=test.check_bin_version(dut_ip) ####
-                test.comparing_versions(before_flash,after_flash,dut_ip)
-                test.mailing_results(before_flash,after_flash,dut_ip,cwd,email)
+                after_flash=test.check_bin_version(dut_ip) 
+                test.comparing_versions(before_flash, after_flash, dut_ip)
+                test.storing_results(before_flash, after_flash, dut_ip, cwd)
                 return flashDict
+
         if cbFlashStatus or ecFlashStatus:
             """ this is required for the reboot part of flash """
-            # test.run_async_command("sleep 2; reboot > /dev/null 2>&1", dut_ip)
-            print("\nPinging DUT IP: %s\n" % dut_ip)
+            test.run_async_command("sleep 2; reboot > /dev/null 2>&1", dut_ip)
+            print("Pinging DUT IP: %s\n" % dut_ip)
             time.sleep(3)
             for i in range(60):
                 if test.check_if_remote_system_is_live(dut_ip):
                     time.sleep(2)
                     flashing_status = "PASS"
                     flashDict[dut_ip] = flashing_status
+                    after_flash=test.check_bin_version(dut_ip) 
+                    test.comparing_versions(before_flash, after_flash, dut_ip)
+                    test.storing_results(before_flash, after_flash, dut_ip, cwd)
                     print("\nDUT IP: %s is back online." % dut_ip)
-                    after_flash=test.check_bin_version(dut_ip) ####
-                    test.comparing_versions(before_flash,after_flash,dut_ip)
-                    test.mailing_results(before_flash,after_flash,dut_ip,cwd,email)
                     return flashDict
                 time.sleep(2)
             flashDict[dut_ip] = flashing_status
             resultDict.update(flashDict)
             return flashDict
+
     else:
         print("DUT IP: %s is not live.\n" % dut_ip)
     flashDict[dut_ip] = flashing_status
     resultDict.update(flashDict)
-    after_flash=test.check_bin_version(dut_ip) ####
-    test.comparing_versions(before_flash,after_flash,dut_ip)
-    test.mailing_results(before_flash,after_flash,dut_ip,cwd,email)
+    after_flash=test.check_bin_version(dut_ip) 
+    test.comparing_versions(before_flash, after_flash, dut_ip)
+    test.storing_results(before_flash, after_flash, dut_ip, cwd)
     return flashDict   
 
 
+
 if __name__ == "__main__":
-    # email=input("Please enter an E-mail: ")
-    email='results.cssdesk@gmail.com'
+    email=input("Please enter an E-mail: ")
+    """ email='results.cssdesk@gmail.com' """
     t1=time.perf_counter()
     flash_ec = flash_cb = False
+    resultDict = dict()
+
     #Check if destination folder exist else exit
     if not os.path.isdir(bin_location):
         print("Binaries folder doesn't exist. Creating one. Copy binaries into folder named latest and rerun flashing script!")
         createFolders(bin_location)
         sys.exit(1)
+
     binaryDict = find_and_return_latest_binaries(bin_location)
+
     if binaryDict:
         if not "ec" in binaryDict:
             binaryDict["ec"] = ""
@@ -152,14 +153,15 @@ if __name__ == "__main__":
     else:
         print("Binaries are not available. Copy binaries into folder named latest and rerun flashing script!")
         sys.exit(1)
-    resultDict = dict()
+
     with multiprocessing.Pool(multiprocessing.cpu_count()) as pool:
-        resultDict=pool.map(partial(FlashBinaries,email=email,cbImageSrc = binaryDict["cb"],
-            ecImageSrc = binaryDict["ec"]), ip_list)
+        resultDict=pool.map(partial(FlashBinaries, email = email, 
+            cbImageSrc = binaryDict["cb"], ecImageSrc = binaryDict["ec"]), ip_list)
+    
     print ("\n************************************************************************")
     print(resultDict) 
-    os.system("mail -s \"CB/EC Flash Results\" %s < %s/flash_info.txt" % (email,cwd))
-    os.remove("%s/flash_info.txt" % cwd)
+    test.adding_to_results(resultDict, cwd)
+    test.mailing_results(cwd, email)
     t2=time.perf_counter()
     tot=t2-t1
     minutes=tot/60
