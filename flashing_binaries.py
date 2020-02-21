@@ -38,8 +38,8 @@ def createFolders(absFolderPath):
         sys.exit(1)
 
 
-def mailing_results(cwd,email,dut_ip):
-    os.system("mail -s \"DUT IP: %s Flash Results\" %s < %s/flash_info.txt" % (dut_ip,email,cwd))
+def mailing_results(cwd,email):
+    os.system("mail -s \"Flash Results\" %s < %s/flash_info.txt" % (email,cwd))
 
 
 def comparing_versions(before_flash, after_flash, dut_ip):
@@ -116,19 +116,20 @@ def FlashBinaries(dut_ip, email, cbImageSrc = "", ecImageSrc = ""):
                 resultDict.update(flashDict)
                 after_flash=test.check_bin_version(dut_ip) ####
                 comparing_versions(before_flash, after_flash, dut_ip)
-                with open('%s/flash_info.txt' % cwd, 'w') as f:
+                with open('%s/flash_info.txt' % cwd, 'a') as f:
                     str1='\n'.join(before_flash)
                     str2='\n'.join(after_flash)
-                    f.write("DUT IP: %s\n" % dut_ip)
-                    f.write("---------------------")
+                    f.write("DUT IP: %s" % dut_ip)
+                    f.write("\n---------------------")
                     f.write("\nBefore Flash:\n%s" % str1)
+                    f.write("\n---------------------")
                     f.write("\nAfter Flash:\n%s" % str2)
-                    f.write("\n")
-                mailing_results(cwd,email,dut_ip)
+                    f.write("\n\n")
+                # mailing_results(cwd,email,dut_ip)
                 return flashDict
         if cbFlashStatus or ecFlashStatus:
             """ this is required for the reboot part of flash """
-            # test.run_async_command("sleep 2; reboot > /dev/null 2>&1", dut_ip)
+            test.run_async_command("sleep 2; reboot > /dev/null 2>&1", dut_ip)
             print("\nPinging DUT IP: %s" % dut_ip)
             time.sleep(3)
             for i in range(60):
@@ -139,15 +140,16 @@ def FlashBinaries(dut_ip, email, cbImageSrc = "", ecImageSrc = ""):
                     print("\nDUT IP: %s is back online." % dut_ip)
                     after_flash=test.check_bin_version(dut_ip) ####
                     comparing_versions(before_flash, after_flash, dut_ip)
-                    with open('%s/flash_info.txt' % cwd, 'w') as f:
+                    with open('%s/flash_info.txt' % cwd, 'a') as f:
                         str1='\n'.join(before_flash)
                         str2='\n'.join(after_flash)
-                        f.write("DUT IP: %s\n" % dut_ip)
-                        f.write("---------------------")
+                        f.write("DUT IP: %s" % dut_ip)
+                        f.write("\n---------------------")
                         f.write("\nBefore Flash:\n%s" % str1)
+                        f.write("\n---------------------")
                         f.write("\nAfter Flash:\n%s" % str2)
-                        f.write("\n")
-                    mailing_results(cwd,email,dut_ip)
+                        f.write("\n\n")
+                    # mailing_results(cwd,email,dut_ip)
                     return flashDict
                 time.sleep(2)
             flashDict[dut_ip] = flashing_status
@@ -159,15 +161,16 @@ def FlashBinaries(dut_ip, email, cbImageSrc = "", ecImageSrc = ""):
     resultDict.update(flashDict)
     after_flash=test.check_bin_version(dut_ip) ####
     comparing_versions(before_flash, after_flash, dut_ip)
-    with open('%s/flash_info.txt' % cwd, 'w') as f:
+    with open('%s/flash_info.txt' % cwd, 'a') as f:
         str1='\n'.join(before_flash)
         str2='\n'.join(after_flash)
-        f.write("DUT IP: %s\n" % dut_ip)
-        f.write("---------------------")
+        f.write("DUT IP: %s" % dut_ip)
+        f.write("\n---------------------")
         f.write("\nBefore Flash:\n%s" % str1)
+        f.write("\n---------------------")
         f.write("\nAfter Flash:\n%s" % str2)
-        f.write("\n")
-    mailing_results(cwd,email,dut_ip)
+        f.write("\n\n")
+    # mailing_results(cwd,email,dut_ip)
     return flashDict   
 
 
@@ -197,7 +200,9 @@ if __name__ == "__main__":
         resultDict=pool.map(partial(FlashBinaries,email=email,cbImageSrc = binaryDict["cb"],
             ecImageSrc = binaryDict["ec"]), ip_list)
     print ("\n************************************************************************")
-    print(resultDict)  
+    print(resultDict) 
+    mailing_results(cwd,email)
+    os.remove("%s/flash_info.txt" % cwd) 
     t2=time.perf_counter()
     tot=t2-t1
     minutes=tot/60
