@@ -101,7 +101,7 @@ def FlashBinaries(dut_ip, email, cwd, cbImageSrc = "", ecImageSrc = ""):
 
         if cbFlashStatus or ecFlashStatus:
             """ this is required for the reboot part of flash """
-            # test.run_async_command("sleep 2; reboot > /dev/null 2>&1", dut_ip)
+            test.run_async_command("sleep 2; reboot > /dev/null 2>&1", dut_ip)
             print("Pinging DUT IP: %s\n" % dut_ip)
             time.sleep(3)
             for i in range(60):
@@ -131,8 +131,8 @@ def FlashBinaries(dut_ip, email, cwd, cbImageSrc = "", ecImageSrc = ""):
 
 
 if __name__ == "__main__":
-    # email=input("Please enter an E-mail: ")
-    email='results.cssdesk@gmail.com'
+    email=input("Please enter an E-mail: ")
+    # email='results.cssdesk@gmail.com'
     t1=time.perf_counter()
     flash_ec = flash_cb = False
     resultDict = dict()
