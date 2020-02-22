@@ -63,20 +63,20 @@ def find_and_return_latest_binaries(binaries_folder_location):
     else:
         return d
 
-def FlashBinaries(dut_ip, email, cbImageSrc = "", ecImageSrc = ""):
+def FlashBinaries(dut_ip, email, cwd, cbImageSrc = "", ecImageSrc = ""):
     flashDict = dict()
     flashing_status = "FAIL"
     cbFlashStatus = False
     ecFlashStatus = False
     if test.check_if_remote_system_is_live(dut_ip):
         print("DUT IP: %s is live.\n" % dut_ip)
-        before_flash=test.check_bin_version(dut_ip) 
+        before_flash=test.check_bin_version(cwd,dut_ip) 
 
         if cbImageSrc:
             cbImageDest = "/tmp/autoflashCB.bin"
-            copy_cb = test.copy_file_from_host_to_dut(cbImageSrc, cbImageDest, dut_ip)
+            copy_cb = test.copy_file_from_host_to_dut(cbImageSrc, cbImageDest, dut_ip, cwd="")
             cbCmd = "flashrom -p host -w " + cbImageDest
-            cbFlashStatus = test.run_command_to_check_non_zero_exit_status(cbCmd, dut_ip)
+            cbFlashStatus = test.run_command_to_check_non_zero_exit_status(cwd, cbCmd, dut_ip)
             if cbFlashStatus:
                 print("DUT IP: %s [CB Flash Successful]\n" % dut_ip)
             if not cbFlashStatus:
@@ -84,9 +84,9 @@ def FlashBinaries(dut_ip, email, cbImageSrc = "", ecImageSrc = ""):
 
         if ecImageSrc:
             ecImageDest = "/tmp/autoflashEC.bin"
-            copy_ec = test.copy_file_from_host_to_dut(ecImageSrc, ecImageDest, dut_ip)
+            copy_ec = test.copy_file_from_host_to_dut(ecImageSrc, ecImageDest, dut_ip, cwd="")
             ecCmd = "flashrom -p ec -w " + ecImageDest
-            ecFlashStatus = test.run_command_to_check_non_zero_exit_status(ecCmd, dut_ip)
+            ecFlashStatus = test.run_command_to_check_non_zero_exit_status(cwd, ecCmd, dut_ip)
             if ecFlashStatus:
                 print("DUT IP: %s [EC Flash Successful]\n" % dut_ip)
             if not ecFlashStatus:
@@ -94,14 +94,14 @@ def FlashBinaries(dut_ip, email, cbImageSrc = "", ecImageSrc = ""):
 
                 flashDict[dut_ip] = flashing_status
                 resultDict.update(flashDict)
-                after_flash=test.check_bin_version(dut_ip) 
+                after_flash=test.check_bin_version(cwd,dut_ip) 
                 test.comparing_versions(before_flash, after_flash, dut_ip)
                 test.storing_results(before_flash, after_flash, dut_ip, cwd)
                 return flashDict
 
         if cbFlashStatus or ecFlashStatus:
             """ this is required for the reboot part of flash """
-            test.run_async_command("sleep 2; reboot > /dev/null 2>&1", dut_ip)
+            # test.run_async_command("sleep 2; reboot > /dev/null 2>&1", dut_ip)
             print("Pinging DUT IP: %s\n" % dut_ip)
             time.sleep(3)
             for i in range(60):
@@ -109,7 +109,7 @@ def FlashBinaries(dut_ip, email, cbImageSrc = "", ecImageSrc = ""):
                     time.sleep(2)
                     flashing_status = "PASS"
                     flashDict[dut_ip] = flashing_status
-                    after_flash=test.check_bin_version(dut_ip) 
+                    after_flash=test.check_bin_version(cwd,dut_ip) 
                     test.comparing_versions(before_flash, after_flash, dut_ip)
                     test.storing_results(before_flash, after_flash, dut_ip, cwd)
                     print("\nDUT IP: %s is back online." % dut_ip)
@@ -123,7 +123,7 @@ def FlashBinaries(dut_ip, email, cbImageSrc = "", ecImageSrc = ""):
         print("DUT IP: %s is not live.\n" % dut_ip)
     flashDict[dut_ip] = flashing_status
     resultDict.update(flashDict)
-    after_flash=test.check_bin_version(dut_ip) 
+    after_flash=test.check_bin_version(cwd,dut_ip) 
     test.comparing_versions(before_flash, after_flash, dut_ip)
     test.storing_results(before_flash, after_flash, dut_ip, cwd)
     return flashDict   
@@ -131,8 +131,8 @@ def FlashBinaries(dut_ip, email, cbImageSrc = "", ecImageSrc = ""):
 
 
 if __name__ == "__main__":
-    email=input("Please enter an E-mail: ")
-    """ email='results.cssdesk@gmail.com' """
+    # email=input("Please enter an E-mail: ")
+    email='results.cssdesk@gmail.com'
     t1=time.perf_counter()
     flash_ec = flash_cb = False
     resultDict = dict()
@@ -155,10 +155,10 @@ if __name__ == "__main__":
         sys.exit(1)
 
     with multiprocessing.Pool(multiprocessing.cpu_count()) as pool:
-        resultDict=pool.map(partial(FlashBinaries, email = email, 
+        resultDict = pool.map(partial(FlashBinaries, email = email, cwd = cwd,
             cbImageSrc = binaryDict["cb"], ecImageSrc = binaryDict["ec"]), ip_list)
     
-    print ("\n************************************************************************")
+    print("\n************************************************************************")
     print(resultDict) 
     test.adding_to_results(resultDict, cwd)
     test.mailing_results(cwd, email)

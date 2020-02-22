@@ -30,7 +30,7 @@ class ChromeTestLib(object):
         with open('%s/flash_info.txt' % cwd, 'a') as f:
             str1='\n'.join(before_flash)
             str2='\n'.join(after_flash)
-            f.write("DUT IP: %s" % dut_ip)
+            f.write("\nDUT IP: %s" % dut_ip)
             f.write("\n---------------------")
             f.write("\nPrevious Versions:\n%s" % str1)
             f.write("\n---------------------")
@@ -40,7 +40,8 @@ class ChromeTestLib(object):
     
     def adding_to_results(self, input, cwd):
         with open('%s/flash_info.txt' % cwd, 'a') as f:
-            f.write("************************************************\n")
+            f.write("\n")
+            # f.write("************************************************\n")
             f.write(str(input)) 
             f.close()
 
@@ -48,7 +49,7 @@ class ChromeTestLib(object):
         os.system("mail -s \"CB/EC Flash Results\" %s < %s/flash_info.txt" % (email,cwd))
         os.remove("%s/flash_info.txt" % cwd)
 
-    def copy_file_from_host_to_dut(self, src, dst, dut_ip):
+    def copy_file_from_host_to_dut(self, src, dst, dut_ip, cwd):
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         client.connect(dut_ip, username='root', password='test0000')
@@ -57,14 +58,14 @@ class ChromeTestLib(object):
         sftp.put(src, dst)		
         sftp.close()
 
-        if self.run_command_to_check_non_zero_exit_status(command="",dut_ip=dut_ip):	
+        if self.run_command_to_check_non_zero_exit_status(cwd="",command="",dut_ip=dut_ip):	
             print ("DUT IP: %s [Image Copy Successfull]\n" % dut_ip)	
             return True
         else:
             print ("DUT IP: %s [Image Copy Unsuccessfull]\n" % dut_ip)	
             return False
 
-    def run_command_to_check_non_zero_exit_status(self, command, dut_ip, username = "root", password = "test0000"):
+    def run_command_to_check_non_zero_exit_status(self, cwd, command, dut_ip, username = "root", password = "test0000"):
         global cmd_output
         if self.check_if_remote_system_is_live(dut_ip):
             try:
@@ -79,8 +80,9 @@ class ChromeTestLib(object):
                 cmd_output = out
                 if command_exit_status == 0:
                     if "Skip jumping to RO" in out:
-                        print("[[Not flashed properly and must be completed using Servo]]")
-                        return False
+                        msg="[[EC was not flashed properly and must be completed using Servo]]"
+                        print(msg)
+                        self.adding_to_results(("DUT IP: %s %s\n" % (dut_ip,msg)), cwd)
                     return True
                 elif "flashrom" in command:
                     print("[[This is flashrom related command and flash status can be decided" 
@@ -98,14 +100,14 @@ class ChromeTestLib(object):
         return False
 
 
-    def check_bin_version(self, dut_ip):
+    def check_bin_version(self, cwd, dut_ip):
         global cmd_output
         cmd1='crossystem | grep fwid | awk \'{print $1,$2,$3}\''
         cmd2='ectool version | awk \'NR==1,NR==2{print $1,$2,$3}\''
 
-        self.run_command_to_check_non_zero_exit_status(cmd1,dut_ip)
+        self.run_command_to_check_non_zero_exit_status(cwd=cwd,command=cmd1,dut_ip=dut_ip)
         cb_ver = cmd_output
-        self.run_command_to_check_non_zero_exit_status(cmd2,dut_ip)
+        self.run_command_to_check_non_zero_exit_status(cwd=cwd,command=cmd2,dut_ip=dut_ip)
         ec_ver = cmd_output
 
         return cb_ver, ec_ver
