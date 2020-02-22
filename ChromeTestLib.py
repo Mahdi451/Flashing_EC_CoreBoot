@@ -41,13 +41,24 @@ class ChromeTestLib(object):
     def adding_to_results(self, input, cwd):
         with open('%s/flash_info.txt' % cwd, 'a') as f:
             f.write("\n")
-            # f.write("************************************************\n")
             f.write(str(input)) 
             f.close()
 
     def mailing_results(self, cwd, email):
         os.system("mail -s \"CB/EC Flash Results\" %s < %s/flash_info.txt" % (email,cwd))
         os.remove("%s/flash_info.txt" % cwd)
+
+    def check_bin_version(self, cwd, dut_ip):
+        global cmd_output
+        cmd1='crossystem | grep fwid | awk \'{print $1,$2,$3}\''
+        cmd2='ectool version | awk \'NR==1,NR==2{print $1,$2,$3}\''
+
+        self.run_command_to_check_non_zero_exit_status(cwd=cwd,command=cmd1,dut_ip=dut_ip)
+        cb_ver = cmd_output
+        self.run_command_to_check_non_zero_exit_status(cwd=cwd,command=cmd2,dut_ip=dut_ip)
+        ec_ver = cmd_output
+
+        return cb_ver, ec_ver
 
     def copy_file_from_host_to_dut(self, src, dst, dut_ip, cwd):
         client = paramiko.SSHClient()
@@ -100,19 +111,6 @@ class ChromeTestLib(object):
         return False
 
 
-    def check_bin_version(self, cwd, dut_ip):
-        global cmd_output
-        cmd1='crossystem | grep fwid | awk \'{print $1,$2,$3}\''
-        cmd2='ectool version | awk \'NR==1,NR==2{print $1,$2,$3}\''
-
-        self.run_command_to_check_non_zero_exit_status(cwd=cwd,command=cmd1,dut_ip=dut_ip)
-        cb_ver = cmd_output
-        self.run_command_to_check_non_zero_exit_status(cwd=cwd,command=cmd2,dut_ip=dut_ip)
-        ec_ver = cmd_output
-
-        return cb_ver, ec_ver
-
-
     def run_async_command(self, command, dut_ip, username = "root", password = "test0000"):
         if self.check_if_remote_system_is_live(dut_ip):
             try:
@@ -129,7 +127,6 @@ class ChromeTestLib(object):
             except EOFError:
                 print ("Failed EOFError")
         return False
-
 
 
 
