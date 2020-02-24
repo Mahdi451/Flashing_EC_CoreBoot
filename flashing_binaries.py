@@ -111,6 +111,7 @@ def FlashBinaries(dut_ip, email, cwd, cbImageSrc = "", ecImageSrc = ""):
             flashDict[dut_ip] = flashing_status
             resultDict.update(flashDict)
             return flashDict
+
         else:
             flashDict[dut_ip] = flashing_status
             resultDict.update(flashDict)
