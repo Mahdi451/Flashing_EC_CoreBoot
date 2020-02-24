@@ -53,9 +53,9 @@ class ChromeTestLib(object):
         cmd1='crossystem | grep fwid | awk \'{print $1,$2,$3}\''
         cmd2='ectool version | awk \'NR==1,NR==2{print $1,$2,$3}\''
 
-        self.run_command_to_check_non_zero_exit_status(cwd=cwd,command=cmd1,dut_ip=dut_ip)
+        self.run_command_to_check_non_zero_exit_status(cwd=cwd, command=cmd1, dut_ip=dut_ip)
         cb_ver = cmd_output
-        self.run_command_to_check_non_zero_exit_status(cwd=cwd,command=cmd2,dut_ip=dut_ip)
+        self.run_command_to_check_non_zero_exit_status(cwd=cwd, command=cmd2, dut_ip=dut_ip)
         ec_ver = cmd_output
 
         return cb_ver, ec_ver
@@ -69,7 +69,7 @@ class ChromeTestLib(object):
         sftp.put(src, dst)		
         sftp.close()
 
-        if self.run_command_to_check_non_zero_exit_status(cwd="",command="",dut_ip=dut_ip):	
+        if self.run_command_to_check_non_zero_exit_status(cwd="", command="", dut_ip=dut_ip):	
             print ("DUT IP: %s [Image Copy Successful]\n" % dut_ip)	
             return True
         else:
@@ -82,7 +82,7 @@ class ChromeTestLib(object):
             try:
                 client = paramiko.SSHClient()
                 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                client.connect(dut_ip, username= username, password= password)
+                client.connect(dut_ip, username=username, password=password)
                 stdin, stdout, stderr = client.exec_command(command)
                 command_exit_status = stdout.channel.recv_exit_status()
                 out = stdout.read().decode('utf-8').strip("\n")
@@ -96,11 +96,14 @@ class ChromeTestLib(object):
                         self.adding_to_results(("DUT IP: %s %s\n" % (dut_ip,msg)), cwd)
                     return True
                 elif "flashrom" in command:
-                    print("[[This is flashrom related command and flash status can be decided" 
-                    + "\nbased on flashing only as verification fails most of the time]]")
+                    # print("[[This is flashrom related command and flash status can be decided" 
+                    # + "\nbased on flashing only as verification fails most of the time]]")
                     if "Erasing and writing flash chip" in out:
                         return True
                     else:
+                        msg="[[Failed to write to flash chip]]"
+                        print(msg)
+                        self.adding_to_results(("DUT IP: %s %s\n" % (dut_ip,msg)), cwd)
                         return False
             except paramiko.ssh_exception.NoValidConnectionsError as error:
                 print("Failed to connect to host '%s' with error: %s" % (dut_ip, error))
@@ -111,12 +114,12 @@ class ChromeTestLib(object):
         return False
 
 
-    def run_async_command(self, command, dut_ip, username = "root", password = "test0000"):
+    def run_async_command(self, command, dut_ip, username="root", password="test0000"):
         if self.check_if_remote_system_is_live(dut_ip):
             try:
                 client = paramiko.SSHClient()
                 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                client.connect(dut_ip, username= username, password= password)
+                client.connect(dut_ip, username=username, password=password)
                 stdin, stdout, stderr = client.exec_command(command)
                 client.close()
                 return True              
