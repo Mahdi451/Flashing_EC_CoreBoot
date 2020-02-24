@@ -2,7 +2,7 @@ import re, os, platform
 import subprocess, paramiko
 from smtplib import SMTP
 
-global cmd_output
+# global cmd_output
 
 class ChromeTestLib(object):
 
@@ -49,14 +49,17 @@ class ChromeTestLib(object):
         os.remove("%s/flash_info.txt" % cwd)
 
     def check_bin_version(self, cwd, dut_ip):
-        global cmd_output
+        # global cmd_output
         cmd1='crossystem | grep fwid | awk \'{print $1,$2,$3}\''
         cmd2='ectool version | awk \'NR==1,NR==2{print $1,$2,$3}\''
 
-        self.run_command_to_check_non_zero_exit_status(cwd=cwd, command=cmd1, dut_ip=dut_ip)
-        cb_ver = cmd_output
-        self.run_command_to_check_non_zero_exit_status(cwd=cwd, command=cmd2, dut_ip=dut_ip)
-        ec_ver = cmd_output
+        cb_ver=self.run_async_command(cmd1, dut_ip)
+        ec_ver=self.run_async_command(cmd2, dut_ip)
+
+        # self.run_command_to_check_non_zero_exit_status(cwd=cwd, command=cmd1, dut_ip=dut_ip)
+        # cb_ver = cmd_output
+        # self.run_command_to_check_non_zero_exit_status(cwd=cwd, command=cmd2, dut_ip=dut_ip)
+        # ec_ver = cmd_output
 
         return cb_ver, ec_ver
 
@@ -77,7 +80,7 @@ class ChromeTestLib(object):
             return False
 
     def run_command_to_check_non_zero_exit_status(self, cwd, command, dut_ip, username = "root", password = "test0000"):
-        global cmd_output
+        # global cmd_output
         if self.check_if_remote_system_is_live(dut_ip):
             try:
                 client = paramiko.SSHClient()
@@ -88,7 +91,7 @@ class ChromeTestLib(object):
                 out = stdout.read().decode('utf-8').strip("\n")
                 """ print ('This is error = %s' % stderr.read()) """
                 client.close()
-                cmd_output = out
+                # cmd_output = out
                 if command_exit_status == 0:
                     if "Skip jumping to RO" in out:
                         # print("[[EC was not flashed properly and must be completed using Servo]]")
@@ -122,8 +125,10 @@ class ChromeTestLib(object):
                 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
                 client.connect(dut_ip, username=username, password=password)
                 stdin, stdout, stderr = client.exec_command(command)
+                out = stdout.read().decode('utf-8').strip("\n")
                 client.close()
-                return True              
+                return out    
+                # return True        
             except paramiko.ssh_exception.NoValidConnectionsError as error:
                 print("Failed to connect to host '%s' with error: %s" % (dut_ip, error))
             except paramiko.AuthenticationException as error:
