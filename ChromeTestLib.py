@@ -70,10 +70,10 @@ class ChromeTestLib(object):
         sftp.close()
 
         if self.run_command_to_check_non_zero_exit_status(cwd="",command="",dut_ip=dut_ip):	
-            print ("DUT IP: %s [Image Copy Successfull]\n" % dut_ip)	
+            print ("DUT IP: %s [Image Copy Successful]\n" % dut_ip)	
             return True
         else:
-            print ("DUT IP: %s [Image Copy Unsuccessfull]\n" % dut_ip)	
+            print ("DUT IP: %s [Image Copy Unsuccessful]\n" % dut_ip)	
             return False
 
     def run_command_to_check_non_zero_exit_status(self, cwd, command, dut_ip, username = "root", password = "test0000"):
@@ -203,8 +203,8 @@ class ChromeTestLib(object):
         sftp.close()
 
         if os.path.isfile(dst):
-            print ("--> File copy successfull.")
+            print ("--> File copy successful.")
             return True
         else:
-            print ("--> File copy unsuccessfull.")
+            print ("--> File copy unsuccessful.")
             return False """

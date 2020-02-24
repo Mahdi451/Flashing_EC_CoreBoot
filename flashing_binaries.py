@@ -68,6 +68,7 @@ def FlashBinaries(dut_ip, email, cwd, cbImageSrc = "", ecImageSrc = ""):
     flashing_status = "FAIL"
     cbFlashStatus = False
     ecFlashStatus = False
+    # before_flash=test.check_bin_version(cwd,dut_ip) 
     if test.check_if_remote_system_is_live(dut_ip):
         print("DUT IP: %s is live.\n" % dut_ip)
         before_flash=test.check_bin_version(cwd,dut_ip) 
@@ -121,11 +122,13 @@ def FlashBinaries(dut_ip, email, cwd, cbImageSrc = "", ecImageSrc = ""):
 
     else:
         print("DUT IP: %s is not live.\n" % dut_ip)
+        test.adding_to_results(("DUT IP: %s is not live.\n" % dut_ip),cwd)
     flashDict[dut_ip] = flashing_status
     resultDict.update(flashDict)
-    after_flash=test.check_bin_version(cwd,dut_ip) 
-    test.comparing_versions(before_flash, after_flash, dut_ip)
-    test.storing_results(before_flash, after_flash, dut_ip, cwd)
+    # after_flash=test.check_bin_version(cwd,dut_ip) 
+    # after_flash = before_flash
+    # test.comparing_versions(before_flash, after_flash, dut_ip)
+    # test.storing_results(before_flash, after_flash, dut_ip, cwd)
     return flashDict   
 
 
