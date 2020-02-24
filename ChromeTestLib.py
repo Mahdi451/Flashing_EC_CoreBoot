@@ -93,7 +93,7 @@ class ChromeTestLib(object):
                     if "Skip jumping to RO" in out:
                         # print("[[EC was not flashed properly and must be completed using Servo]]")
                         msg="EC was not flashed properly."
-                        self.adding_to_results(("DUT IP: %s\n%s\n" % (dut_ip,msg)), cwd)
+                        self.adding_to_results(("\nDUT IP: %s - %s\n" % (dut_ip,msg)), cwd)
                         return False
                     return True
                 elif "flashrom" in command:
@@ -104,7 +104,7 @@ class ChromeTestLib(object):
                     else:
                         # print("[[Failed to write to flash chip]]")
                         msg="CB was not flashed properly"
-                        self.adding_to_results(("DUT IP: %s\n%s\n" % (dut_ip,msg)), cwd)
+                        self.adding_to_results(("\nDUT IP: %s - %s\n" % (dut_ip,msg)), cwd)
                         return False
             except paramiko.ssh_exception.NoValidConnectionsError as error:
                 print("Failed to connect to host '%s' with error: %s" % (dut_ip, error))
