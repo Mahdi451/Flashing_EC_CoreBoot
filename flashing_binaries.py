@@ -92,14 +92,7 @@ def FlashBinaries(dut_ip, email, cwd, cbImageSrc = "", ecImageSrc = ""):
             if not ecFlashStatus:
                 print("DUT IP: %s [EC Flash Unsuccessful]\n" % dut_ip)
 
-                flashDict[dut_ip] = flashing_status
-                resultDict.update(flashDict)
-                after_flash=test.check_bin_version(cwd,dut_ip) 
-                test.comparing_versions(before_flash, after_flash, dut_ip)
-                test.storing_results(before_flash, after_flash, dut_ip, cwd)
-                return flashDict
-
-        if cbFlashStatus or ecFlashStatus:
+        if cbFlashStatus and ecFlashStatus:
             """ this is required for the reboot part of flash """
             test.run_async_command("sleep 2; reboot > /dev/null 2>&1", dut_ip)
             print("Pinging DUT IP: %s\n" % dut_ip)
@@ -112,11 +105,18 @@ def FlashBinaries(dut_ip, email, cwd, cbImageSrc = "", ecImageSrc = ""):
                     after_flash=test.check_bin_version(cwd,dut_ip) 
                     test.comparing_versions(before_flash, after_flash, dut_ip)
                     test.storing_results(before_flash, after_flash, dut_ip, cwd)
-                    print("\nDUT IP: %s is back online." % dut_ip)
+                    print("DUT IP: %s is back online.\n" % dut_ip)
                     return flashDict
                 time.sleep(2)
             flashDict[dut_ip] = flashing_status
             resultDict.update(flashDict)
+            return flashDict
+        else:
+            flashDict[dut_ip] = flashing_status
+            resultDict.update(flashDict)
+            after_flash=test.check_bin_version(cwd,dut_ip) 
+            test.comparing_versions(before_flash, after_flash, dut_ip)
+            test.storing_results(before_flash, after_flash, dut_ip, cwd)
             return flashDict
 
     else:
