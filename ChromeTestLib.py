@@ -34,14 +34,16 @@ class ChromeTestLib(object):
             f.write("\n---------------------")
             f.write("\nPrevious Versions:\n%s" % str1)
             f.write("\n---------------------")
-            f.write("\nCurrent Versions:\n%s" % str2)
-            f.write("\n\n")
+            f.write("\nCurrent Versions:\n%s\n" % str2)
             f.close()
     
-    def adding_to_results(self, input, cwd):
+    def adding_to_results(self, input1, cwd):
         with open('%s/flash_info.txt' % cwd, 'a') as f:
             f.write("\n")
-            f.write(str(input)) 
+            if input1 is not str():
+                f.write(str(input1))
+            else:
+                f.write(input1) 
             f.close()
 
     def mailing_results(self, cwd, email):

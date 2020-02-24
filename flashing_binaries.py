@@ -160,6 +160,7 @@ if __name__ == "__main__":
     
     print("\n************************************************************************")
     print(resultDict) 
+    test.adding_to_results("Flash Results:", cwd)
     test.adding_to_results(resultDict, cwd)
     test.mailing_results(cwd, email)
     t2=time.perf_counter()
