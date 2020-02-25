@@ -24,6 +24,8 @@ class ChromeTestLib(object):
             print("DUT IP: %s  Changes were made to CB but not EC.\n" % dut_ip)
         elif ((before_flash[0] == after_flash[0]) and (before_flash[1] != after_flash[1])):
             print("DUT IP: %s  Changes were made to EC but not CB.\n" % dut_ip)
+        elif ((before_flash[0] != after_flash[0]) and (before_flash[1] != after_flash[1])):
+            print("DUT IP: %s  Changes were made to both CB and EC.\n" % dut_ip)
 
 
     def storing_results(self, before_flash, after_flash, dut_ip, cwd):
