@@ -48,7 +48,7 @@ class ChromeTestLib(object):
     def convert_dict(self, resultDict, cwd):
         for cur_dict in resultDict:
             for i, (j, k) in enumerate(cur_dict.items()):
-                result=("%s - %s" % (j, k))
+                result=("DUT IP: %s   -->   %s" % (j, k))
                 self.adding_to_results(result, cwd)
 
     def mailing_results(self, cwd, email):
