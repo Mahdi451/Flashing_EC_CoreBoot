@@ -16,6 +16,7 @@ class ChromeTestLib(object):
         else:
             return False
 
+
     def comparing_versions(self,before_flash, after_flash, dut_ip):
         if ((before_flash[0] == after_flash[0]) and (before_flash[1] == after_flash[1])):
             print("DUT IP: %s  No changes were made to CB or EC.\n" % dut_ip)
@@ -24,18 +25,19 @@ class ChromeTestLib(object):
         elif ((before_flash[0] == after_flash[0]) and (before_flash[1] != after_flash[1])):
             print("DUT IP: %s  Changes were made to EC but not CB.\n" % dut_ip)
 
+
     def storing_results(self, before_flash, after_flash, dut_ip, cwd):
         with open('%s/flash_info.txt' % cwd, 'a') as f:
             str1='\n'.join(before_flash)
             str2='\n'.join(after_flash)
-            f.write("\nDUT IP: %s" % dut_ip)
-            f.write("\n---------------------")
-            f.write("\nPrevious Versions:\n%s" % str1)
-            f.write("\n---------------------")
-            f.write("\nCurrent Versions:\n%s" % str2)
-            f.write("\n")
+            f.write("\nDUT IP: %s\n" % dut_ip)
+            f.write("---------------------\n")
+            f.write("Previous Versions:\n%s\n" % str1)
+            f.write("---------------------\n")
+            f.write("Current Versions:\n%s\n" % str2)
             f.close()
     
+
     def adding_to_results(self, input1, cwd):
         with open('%s/flash_info.txt' % cwd, 'a') as f:
             f.write("\n")
@@ -45,15 +47,18 @@ class ChromeTestLib(object):
                 f.write(input1) 
             f.close()
 
+
     def convert_dict(self, resultDict, cwd):
         for cur_dict in resultDict:
             for i, (j, k) in enumerate(cur_dict.items()):
-                result=("DUT IP: %s   -->   %s" % (j, k))
+                result = ("DUT IP: %s   -->   %s" % (j, k))
                 self.adding_to_results(result, cwd)
+
 
     def mailing_results(self, cwd, email):
         os.system("mail -s \"CB/EC Flash Results\" %s < %s/flash_info.txt" % (email,cwd))
         os.remove("%s/flash_info.txt" % cwd)
+
 
     def check_bin_version(self, cwd, dut_ip):
         cmd1='crossystem | grep fwid | awk \'{print $1,$2,$3}\''
@@ -61,6 +66,7 @@ class ChromeTestLib(object):
         cb_ver=self.run_async_command(cmd1, dut_ip)
         ec_ver=self.run_async_command(cmd2, dut_ip)
         return cb_ver, ec_ver
+
 
     def copy_file_from_host_to_dut(self, src, dst, dut_ip, cwd):
         client = paramiko.SSHClient()
@@ -77,6 +83,7 @@ class ChromeTestLib(object):
         else:
             print ("DUT IP: %s [Image Copy Unsuccessful]\n" % dut_ip)	
             return False
+
 
     def run_command_to_check_non_zero_exit_status(self, cwd, command, dut_ip, username = "root", password = "test0000"):
         if self.check_if_remote_system_is_live(dut_ip):
@@ -103,7 +110,7 @@ class ChromeTestLib(object):
                         return True
                     else:
                         # print("[[Failed to write to flash chip]]")
-                        msg="CB was not flashed properly"
+                        msg="CB was not flashed properly."
                         self.adding_to_results(("\nDUT IP: %s - %s\n" % (dut_ip,msg)), cwd)
                         return False
             except paramiko.ssh_exception.NoValidConnectionsError as error:
@@ -113,6 +120,7 @@ class ChromeTestLib(object):
             except EOFError:
                 print ("Failed EOFError")
         return False
+
 
     def run_async_command(self, command, dut_ip, username="root", password="test0000"):
         if self.check_if_remote_system_is_live(dut_ip):

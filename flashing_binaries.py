@@ -21,6 +21,7 @@ with open(("%s/%s" % (cwd,args.ip))) as f:
         ip_list.append(ip.rstrip())
     f.close()
 
+
 def createFolders(absFolderPath):
     try:
         os.makedirs(absFolderPath)
@@ -32,6 +33,7 @@ def createFolders(absFolderPath):
         print ("Exception found!!!")
         print (e)
         sys.exit(1)
+
 
 def find_and_return_latest_binaries(binaries_folder_location):
     d = dict()
@@ -62,6 +64,7 @@ def find_and_return_latest_binaries(binaries_folder_location):
         return False
     else:
         return d
+
 
 def FlashBinaries(dut_ip, email, cwd, cbImageSrc = "", ecImageSrc = ""):
     flashDict = dict()
@@ -127,7 +130,6 @@ def FlashBinaries(dut_ip, email, cwd, cbImageSrc = "", ecImageSrc = ""):
     return flashDict   
 
 
-
 if __name__ == "__main__":
     email=input("Please enter an E-mail: ")
     # email='results.cssdesk@gmail.com'
@@ -160,12 +162,6 @@ if __name__ == "__main__":
     print(resultDict)
     test.adding_to_results(("*********************\n" + "Flash Results:"), cwd)
     test.convert_dict(resultDict, cwd)
-
-    # test.adding_to_results(resultDict, cwd)
-    # for cur_dict in resultDict:
-    #     for i, (j, k) in enumerate(cur_dict.items()):
-    #         print(j, k)
-
     test.mailing_results(cwd, email)
     t2=time.perf_counter()
     tot=t2-t1
