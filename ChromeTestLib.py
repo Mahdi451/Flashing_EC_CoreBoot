@@ -101,8 +101,8 @@ class ChromeTestLib(object):
                 if command_exit_status == 0:
                     if "Skip jumping to RO" in out:
                         # print("[[EC was not flashed properly and must be completed using Servo]]")
-                        msg="EC might need to flashed using Servo for RW version."
-                        self.adding_to_results(("\nDUT IP: %s - %s\n" % (dut_ip,msg)), cwd)
+                        msg="If no updates were made to RW version.\nEC must be flashed using Servo."
+                        self.adding_to_results(("\nDUT IP: %s \n%s\n" % (dut_ip,msg)), cwd)
                     return True
                 elif "flashrom" in command:
                     # print("[[This is flashrom related command and flash status can be decided" 
