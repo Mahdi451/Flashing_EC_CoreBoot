@@ -97,10 +97,11 @@ def FlashBinaries(dut_ip, email, cwd, cbImageSrc = "", ecImageSrc = ""):
                 print("DUT IP: %s [EC Flash Unsuccessful]\n" % dut_ip)
 
         if cbFlashStatus and ecFlashStatus:
-            """ this is required for the reboot part of flash """
+            """ this is required for rebooting after flash """
             test.run_async_command("sleep 2; reboot > /dev/null 2>&1", dut_ip)
             print("Pinging DUT IP: %s\n" % dut_ip)
             for i in range(60):
+                time.sleep(2)
                 if test.check_if_remote_system_is_live(dut_ip):
                     flashing_status = "PASS"
                     flashDict[dut_ip] = flashing_status

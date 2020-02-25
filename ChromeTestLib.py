@@ -69,7 +69,7 @@ class ChromeTestLib(object):
         ec_ver=self.run_async_command(cmd2, dut_ip)
         return cb_ver, ec_ver
 
-
+    """  scp [file] [username@host]:/path/to/directory/  """
     def copy_file_from_host_to_dut(self, src, dst, dut_ip, cwd):
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -101,9 +101,8 @@ class ChromeTestLib(object):
                 if command_exit_status == 0:
                     if "Skip jumping to RO" in out:
                         # print("[[EC was not flashed properly and must be completed using Servo]]")
-                        msg="EC was not flashed properly."
+                        msg="EC might need to flashed using Servo for RW version."
                         self.adding_to_results(("\nDUT IP: %s - %s\n" % (dut_ip,msg)), cwd)
-                        return False
                     return True
                 elif "flashrom" in command:
                     # print("[[This is flashrom related command and flash status can be decided" 
@@ -133,7 +132,10 @@ class ChromeTestLib(object):
                 stdin, stdout, stderr = client.exec_command(command)
                 out = stdout.read().decode('utf-8').strip("\n")
                 client.close()
-                return out    
+                if "|" in command:
+                    return out
+                else:
+                    return True   
                 # return True        
             except paramiko.ssh_exception.NoValidConnectionsError as error:
                 print("Failed to connect to host '%s' with error: %s" % (dut_ip, error))
