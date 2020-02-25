@@ -2,8 +2,6 @@ import re, os, platform
 import subprocess, paramiko
 from smtplib import SMTP
 
-# global cmd_output
-
 class ChromeTestLib(object):
 
     def check_if_remote_system_is_live(self, dut_ip):
@@ -34,7 +32,8 @@ class ChromeTestLib(object):
             f.write("\n---------------------")
             f.write("\nPrevious Versions:\n%s" % str1)
             f.write("\n---------------------")
-            f.write("\nCurrent Versions:\n%s\n" % str2)
+            f.write("\nCurrent Versions:\n%s" % str2)
+            f.write("\n")
             f.close()
     
     def adding_to_results(self, input1, cwd):
@@ -46,23 +45,21 @@ class ChromeTestLib(object):
                 f.write(input1) 
             f.close()
 
+    def convert_dict(self, resultDict, cwd):
+        for cur_dict in resultDict:
+            for i, (j, k) in enumerate(cur_dict.items()):
+                result=("%s - %s" % (j, k))
+                self.adding_to_results(result, cwd)
+
     def mailing_results(self, cwd, email):
         os.system("mail -s \"CB/EC Flash Results\" %s < %s/flash_info.txt" % (email,cwd))
         os.remove("%s/flash_info.txt" % cwd)
 
     def check_bin_version(self, cwd, dut_ip):
-        # global cmd_output
         cmd1='crossystem | grep fwid | awk \'{print $1,$2,$3}\''
         cmd2='ectool version | awk \'NR==1,NR==2{print $1,$2,$3}\''
-
         cb_ver=self.run_async_command(cmd1, dut_ip)
         ec_ver=self.run_async_command(cmd2, dut_ip)
-
-        # self.run_command_to_check_non_zero_exit_status(cwd=cwd, command=cmd1, dut_ip=dut_ip)
-        # cb_ver = cmd_output
-        # self.run_command_to_check_non_zero_exit_status(cwd=cwd, command=cmd2, dut_ip=dut_ip)
-        # ec_ver = cmd_output
-
         return cb_ver, ec_ver
 
     def copy_file_from_host_to_dut(self, src, dst, dut_ip, cwd):
@@ -82,7 +79,6 @@ class ChromeTestLib(object):
             return False
 
     def run_command_to_check_non_zero_exit_status(self, cwd, command, dut_ip, username = "root", password = "test0000"):
-        # global cmd_output
         if self.check_if_remote_system_is_live(dut_ip):
             try:
                 client = paramiko.SSHClient()
@@ -93,7 +89,6 @@ class ChromeTestLib(object):
                 out = stdout.read().decode('utf-8').strip("\n")
                 """ print ('This is error = %s' % stderr.read()) """
                 client.close()
-                # cmd_output = out
                 if command_exit_status == 0:
                     if "Skip jumping to RO" in out:
                         # print("[[EC was not flashed properly and must be completed using Servo]]")
@@ -118,7 +113,6 @@ class ChromeTestLib(object):
             except EOFError:
                 print ("Failed EOFError")
         return False
-
 
     def run_async_command(self, command, dut_ip, username="root", password="test0000"):
         if self.check_if_remote_system_is_live(dut_ip):

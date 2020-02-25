@@ -97,10 +97,8 @@ def FlashBinaries(dut_ip, email, cwd, cbImageSrc = "", ecImageSrc = ""):
             """ this is required for the reboot part of flash """
             test.run_async_command("sleep 2; reboot > /dev/null 2>&1", dut_ip)
             print("Pinging DUT IP: %s\n" % dut_ip)
-            time.sleep(3)
             for i in range(60):
                 if test.check_if_remote_system_is_live(dut_ip):
-                    time.sleep(2)
                     flashing_status = "PASS"
                     flashDict[dut_ip] = flashing_status
                     after_flash=test.check_bin_version(cwd,dut_ip) 
@@ -108,7 +106,7 @@ def FlashBinaries(dut_ip, email, cwd, cbImageSrc = "", ecImageSrc = ""):
                     test.storing_results(before_flash, after_flash, dut_ip, cwd)
                     print("DUT IP: %s is back online.\n" % dut_ip)
                     return flashDict
-                time.sleep(2)
+                time.sleep(3)
             flashDict[dut_ip] = flashing_status
             resultDict.update(flashDict)
             return flashDict
@@ -158,10 +156,16 @@ if __name__ == "__main__":
         resultDict = pool.map(partial(FlashBinaries, email = email, cwd = cwd,
             cbImageSrc = binaryDict["cb"], ecImageSrc = binaryDict["ec"]), ip_list)
     
-    print("\n************************************************************************")
-    print(resultDict) 
-    test.adding_to_results("Flash Results:", cwd)
-    test.adding_to_results(resultDict, cwd)
+    print("************************************************************************")
+    print(resultDict)
+    test.adding_to_results("*********************\nFlash Results:", cwd)
+    test.convert_dict(resultDict, cwd)
+
+    # test.adding_to_results(resultDict, cwd)
+    # for cur_dict in resultDict:
+    #     for i, (j, k) in enumerate(cur_dict.items()):
+    #         print(j, k)
+
     test.mailing_results(cwd, email)
     t2=time.perf_counter()
     tot=t2-t1
