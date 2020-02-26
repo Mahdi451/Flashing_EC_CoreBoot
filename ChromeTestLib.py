@@ -101,17 +101,13 @@ class ChromeTestLib(object):
                 client.close()
                 if command_exit_status == 0:
                     if "Skip jumping to RO" in out:
-                        # print("[[EC was not flashed properly and must be completed using Servo]]")
-                        msg="If no updates were made to RW version.\nEC must be flashed using Servo."
+                        msg="If no updates were made to RW version,\nEC flash must be completed using Servo."
                         self.adding_to_results(("\nDUT IP: %s \n%s\n" % (dut_ip,msg)), cwd)
                     return True
                 elif "flashrom" in command:
-                    # print("[[This is flashrom related command and flash status can be decided" 
-                    # + "\nbased on flashing only as verification fails most of the time]]")
                     if "Erasing and writing flash chip" in out:
                         return True
                     else:
-                        # print("[[Failed to write to flash chip]]")
                         msg="CB was not flashed properly."
                         self.adding_to_results(("\nDUT IP: %s - %s\n" % (dut_ip,msg)), cwd)
                         return False
@@ -136,8 +132,7 @@ class ChromeTestLib(object):
                 if "|" in command:
                     return out
                 else:
-                    return True   
-                # return True        
+                    return True  
             except paramiko.ssh_exception.NoValidConnectionsError as error:
                 print("Failed to connect to host '%s' with error: %s" % (dut_ip, error))
             except paramiko.AuthenticationException as error:
