@@ -127,7 +127,7 @@ def FlashBinaries(dut_ip, email, cwd, cbImageSrc = "", ecImageSrc = ""):
 
 
 if __name__ == "__main__":
-    email=input("Please enter an E-mail: ")
+    email=input("Please enter an E-mail to receive version comparisons (or press enter to skip): ")
     # email='results.cssdesk@gmail.com'
     t1=time.perf_counter()
     flash_ec = flash_cb = False
