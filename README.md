@@ -1,6 +1,6 @@
 # Flashing Binaries
 
-This script will allow you to both copy over and flash both cb/ec bins on multiple devices simultaneously. 
+This script copies over and flashes both CB\EC simultaneously on multiple devices. 
 
 
 ## Prerequisites
