@@ -48,7 +48,6 @@ def find_and_return_latest_binaries(binaries_folder_location):
         if file.endswith(".bin"):
             file_path = os.path.join(binaries_folder_location, file)
             file_size = os.path.getsize(file_path)
-            #print()
             if 400000 < file_size < 600000:
                 # print ("file size: %d bytes"%os.path.getsize(file_path))
                 # print ("ec file path is: ", file_path)

@@ -19,13 +19,13 @@ class ChromeTestLib(object):
 
     def comparing_versions(self,before_flash, after_flash, dut_ip):
         if ((before_flash[0] == after_flash[0]) and (before_flash[1] == after_flash[1])):
-            print("DUT IP: %s  No changes were made to CB or EC.\n" % dut_ip)
+            print("DUT IP: %s  Changes were not made to CB or EC.\n" % dut_ip)
         elif ((before_flash[0] != after_flash[0]) and (before_flash[1] == after_flash[1])):
             print("DUT IP: %s  Changes were made to CB but not EC.\n" % dut_ip)
         elif ((before_flash[0] == after_flash[0]) and (before_flash[1] != after_flash[1])):
             print("DUT IP: %s  Changes were made to EC but not CB.\n" % dut_ip)
         elif ((before_flash[0] != after_flash[0]) and (before_flash[1] != after_flash[1])):
-            print("DUT IP: %s  Changes were made to both CB and EC.\n" % dut_ip)
+            print("DUT IP: %s  Changes were made to CB and EC.\n" % dut_ip)
 
 
     def storing_results(self, before_flash, after_flash, dut_ip, cwd):
@@ -68,6 +68,7 @@ class ChromeTestLib(object):
         cb_ver=self.run_async_command(cmd1, dut_ip)
         ec_ver=self.run_async_command(cmd2, dut_ip)
         return cb_ver, ec_ver
+
 
     """  scp [file] [username@host]:/path/to/directory/  """
     def copy_file_from_host_to_dut(self, src, dst, dut_ip, cwd):
