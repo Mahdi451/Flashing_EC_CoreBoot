@@ -19,7 +19,7 @@ This command will install all the modules needed to allow this script to run.
 Create a folder called *__latest__* to store the bin files within the same directory as the script.
 
 ```
-requirements.txt  latest  ChromeTestLib.py  flashing_binaries.py  IPs.txt
+requirements.txt  /latest  ChromeTestLib.py  flashing_binaries.py  IPs.txt
 ```
 
 After that insert the IPs you would like to flash into *__IPs.txt__* and you are ready to run the script!
