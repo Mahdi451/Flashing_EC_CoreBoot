@@ -22,7 +22,7 @@ Create a folder called *__latest__* to store the bin files within the same direc
 requirements.txt  latest/  ChromeTestLib.py  flashing_binaries.py  IPs.txt
 ```
 
-After that insert the IPs you would like to flash into *__IPs.txt__* and you are ready to run the script!
+After that place the device ip addresses into *__IPs.txt__* and you are ready to run the script!
 <br>Please enter the e-mails that you would like the  flash results sent to in this format.
 
 ```
