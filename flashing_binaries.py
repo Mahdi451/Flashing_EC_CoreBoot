@@ -153,7 +153,7 @@ if __name__ == "__main__":
     with multiprocessing.Pool(multiprocessing.cpu_count()) as pool:
         resultDict = pool.map(partial(FlashBinaries, email = email, cwd = cwd,
             cbImageSrc = binaryDict["cb"], ecImageSrc = binaryDict["ec"]), ip_list)
-    
+
     print("************************************************************************")
     print(resultDict)
     test.adding_to_results(("*********************\n" + "Flash Results:"), cwd)
