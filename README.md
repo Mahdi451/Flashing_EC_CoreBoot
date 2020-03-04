@@ -2,7 +2,6 @@
 
 This script copies over and flashes both CB\EC simultaneously on multiple devices. 
 
-
 ## Prerequisites
 
 You will need to execute this command in terminal. 
