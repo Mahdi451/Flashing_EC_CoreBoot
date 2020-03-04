@@ -142,7 +142,6 @@ class ChromeTestLib(object):
         return False
 
 
-
     """ def check_if_system_is_a_chrome_os_system(self, ip):
         chromeos_detection_cmd = "cat /etc/lsb-release | grep -i chromeos_release_name"
         output = self.run_command_to_check_non_zero_exit_status(chromeos_detection_cmd, ip)
